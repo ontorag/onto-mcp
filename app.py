@@ -257,9 +257,6 @@ def compose(
 from ontorag.ontology_mcp import create_ontology_mcp
 _mcp = create_ontology_mcp(CATALOG_DIR)
 
-# FastMCP exposes .sse_app() for mounting into any ASGI app
-if hasattr(_mcp, "sse_app"):
-    app.mount("/mcp", _mcp.sse_app())
-    _log.info("MCP SSE endpoint mounted at /mcp")
-else:
-    _log.info("FastMCP version does not expose sse_app(); MCP mount skipped")
+
+app.mount("/mcp", _mcp.sse_app())
+_log.info("MCP SSE endpoint mounted at /mcp")
