@@ -37,12 +37,21 @@ VERBOSITY = int(os.getenv("ONTORAG_VERBOSITY", "0"))
 setup_logging(VERBOSITY)
 _log = get_logger("ontorag.app")
 
+
+
+
+from ontorag.ontology_mcp import create_ontology_mcp
+_mcp = create_ontology_mcp(CATALOG_DIR)
+mcp_app = _mcp.http_app(path='/mcp')
+
+
 # ── FastAPI app ──────────────────────────────────────────────────────
 
 app = FastAPI(
     title="OntoRAG Ontology Catalog",
     version="0.1.0",
     description="Browse, search, and compose baseline ontologies for OntoRAG.",
+    lifespan=mcp_app.lifespan
 )
 
 app.add_middleware(
@@ -254,9 +263,6 @@ def compose(
 # ── MCP SSE mount (for MCP-compatible agents) ───────────────────────
 
 
-from ontorag.ontology_mcp import create_ontology_mcp
-_mcp = create_ontology_mcp(CATALOG_DIR)
 
-
-app.mount("/mcp", _mcp.sse_app())
+app.mount("/", mcp_app.sse_app())
 _log.info("MCP SSE endpoint mounted at /mcp")
