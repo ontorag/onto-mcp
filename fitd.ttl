@@ -1,0 +1,2523 @@
+@prefix fitd:  <https://schema.rpg-schema.org/fitd#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+# ============================================================
+# ONTOLOGY HEADER
+# ============================================================
+
+<https://schema.rpg-schema.org/fitd>
+    a owl:Ontology ;
+    dc:title "Forged in the Dark — General Rules Ontology" ;
+    dc:description "OWL ontology for the Forged in the Dark SRD general rules, derived strictly from the Blades in the Dark SRD. Covers the full rule set: core dice system, actions, attributes, rolls, effects, consequences, harm, stress, trauma, progress clocks, score lifecycle, planning, flashbacks, teamwork, downtime, advancement, crew, factions, claims, cohorts, crafting, rituals, and magnitude." ;
+    dc:source "Blades in the Dark SRD — John Harper, Evil Hat Productions" ;
+    owl:versionInfo "1.0.0" .
+
+# ============================================================
+# 1. DICE SYSTEM — Result Levels
+# ============================================================
+
+fitd:DiceResult
+    a owl:Class ;
+    rdfs:label "Dice Result" ;
+    rdfs:comment "An enumerated class representing the four outcome tiers of any dice roll in FITD: Critical (multiple 6s), Full (single 6), Partial (4-5), Bad (1-3)." .
+
+fitd:Critical
+    a owl:NamedIndividual, fitd:DiceResult ;
+    rdfs:label "Critical" ;
+    rdfs:comment "Highest die is 6 and at least one other die is also 6. Exceptional outcome." .
+
+fitd:FullSuccess
+    a owl:NamedIndividual, fitd:DiceResult ;
+    rdfs:label "Full Success" ;
+    rdfs:comment "Highest die is 6. Things go well." .
+
+fitd:PartialSuccess
+    a owl:NamedIndividual, fitd:DiceResult ;
+    rdfs:label "Partial Success" ;
+    rdfs:comment "Highest die is 4 or 5. Goal achieved but with consequences." .
+
+fitd:BadOutcome
+    a owl:NamedIndividual, fitd:DiceResult ;
+    rdfs:label "Bad Outcome" ;
+    rdfs:comment "Highest die is 1-3. Things go poorly; goal usually not achieved and complications occur." .
+
+# ============================================================
+# 2. POSITION
+# ============================================================
+
+fitd:Position
+    a owl:Class ;
+    rdfs:label "Position" ;
+    rdfs:comment "Enumerated class for the three risk positions of an action roll. Controlled is least risky; Desperate is most dangerous." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:Controlled fitd:Risky fitd:Desperate )
+    ] .
+
+fitd:Controlled
+    a owl:NamedIndividual, fitd:Position ;
+    rdfs:label "Controlled" ;
+    rdfs:comment "Lower risk. Consequences are less severe. Possible outcomes: Full/Partial success with limited consequences, or Reduced Effect." .
+
+fitd:Risky
+    a owl:NamedIndividual, fitd:Position ;
+    rdfs:label "Risky" ;
+    rdfs:comment "Default position. Moderate danger. Consequences include harm, complications, or worse position." .
+
+fitd:Desperate
+    a owl:NamedIndividual, fitd:Position ;
+    rdfs:label "Desperate" ;
+    rdfs:comment "High danger. Severe harm or serious complications even on partial success. Grants XP on desperate action rolls." .
+
+# ============================================================
+# 3. EFFECT LEVEL
+# ============================================================
+
+fitd:EffectLevel
+    a owl:Class ;
+    rdfs:label "Effect Level" ;
+    rdfs:comment "Enumerated class for the magnitude of impact an action has. Great ticks 3 clock segments; Standard ticks 2; Limited ticks 1; Zero ticks none; Extreme exceeds Great." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:ZeroEffect fitd:LimitedEffect fitd:StandardEffect fitd:GreatEffect fitd:ExtremeEffect )
+    ] .
+
+fitd:ZeroEffect
+    a owl:NamedIndividual, fitd:EffectLevel ;
+    rdfs:label "Zero Effect" ;
+    rdfs:comment "Action has no meaningful effect. Caused by severe disadvantage in quality, scale, or potency." .
+
+fitd:LimitedEffect
+    a owl:NamedIndividual, fitd:EffectLevel ;
+    rdfs:label "Limited Effect" ;
+    rdfs:comment "Partial or weak effect. Ticks 1 segment on a progress clock." .
+
+fitd:StandardEffect
+    a owl:NamedIndividual, fitd:EffectLevel ;
+    rdfs:label "Standard Effect" ;
+    rdfs:comment "Normal expected effect. Ticks 2 segments on a progress clock." .
+
+fitd:GreatEffect
+    a owl:NamedIndividual, fitd:EffectLevel ;
+    rdfs:label "Great Effect" ;
+    rdfs:comment "More than usual. Ticks 3 segments on a progress clock." .
+
+fitd:ExtremeEffect
+    a owl:NamedIndividual, fitd:EffectLevel ;
+    rdfs:label "Extreme Effect" ;
+    rdfs:comment "Beyond great. Exceptional circumstances only." .
+
+# ============================================================
+# 4. ATTRIBUTES
+# ============================================================
+
+fitd:Attribute
+    a owl:Class ;
+    rdfs:label "Attribute" ;
+    rdfs:comment "One of the three attributes used for resistance rolls: Insight, Prowess, Resolve. Rating equals the number of filled dots in the first column of its associated actions." .
+
+fitd:Insight
+    a owl:NamedIndividual, fitd:Attribute ;
+    rdfs:label "Insight" ;
+    rdfs:comment "Resists consequences from deception or understanding. Groups the actions: Hunt, Study, Survey, Tinker." .
+
+fitd:Prowess
+    a owl:NamedIndividual, fitd:Attribute ;
+    rdfs:label "Prowess" ;
+    rdfs:comment "Resists consequences from physical strain or injury. Groups the actions: Finesse, Prowl, Skirmish, Wreck." .
+
+fitd:Resolve
+    a owl:NamedIndividual, fitd:Attribute ;
+    rdfs:label "Resolve" ;
+    rdfs:comment "Resists consequences from mental strain or willpower. Groups the actions: Attune, Command, Consort, Sway." .
+
+# ============================================================
+# 5. ACTIONS
+# ============================================================
+
+fitd:Action
+    a owl:Class ;
+    rdfs:label "Action" ;
+    rdfs:comment "One of the 12 standard actions player characters use to overcome obstacles. Each action belongs to one Attribute and has a rating from 0 to 4." .
+
+# --- Insight actions ---
+fitd:Hunt
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Hunt" ;
+    fitd:belongsToAttribute fitd:Insight ;
+    rdfs:comment "Carefully track a target. Follow, locate, arrange ambushes, attack with precision at range." .
+
+fitd:Study
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Study" ;
+    fitd:belongsToAttribute fitd:Insight ;
+    rdfs:comment "Scrutinize details and interpret evidence. Gather info from documents, research esoteric topics, detect lies." .
+
+fitd:Survey
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Survey" ;
+    fitd:belongsToAttribute fitd:Insight ;
+    rdfs:comment "Observe the situation and anticipate outcomes. Spot trouble, uncover opportunities, detect intentions." .
+
+fitd:Tinker
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Tinker" ;
+    fitd:belongsToAttribute fitd:Insight ;
+    rdfs:comment "Fiddle with devices and mechanisms. Create gadgets, pick locks, disable alarms, craft items." .
+
+# --- Prowess actions ---
+fitd:Finesse
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Finesse" ;
+    fitd:belongsToAttribute fitd:Prowess ;
+    rdfs:comment "Employ dextrous manipulation or subtle misdirection. Pickpocket, handle vehicles, formal dueling." .
+
+fitd:Prowl
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Prowl" ;
+    fitd:belongsToAttribute fitd:Prowess ;
+    rdfs:comment "Traverse skillfully and quietly. Sneak, hide in shadows, run across rooftops, backstab from hiding." .
+
+fitd:Skirmish
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Skirmish" ;
+    fitd:belongsToAttribute fitd:Prowess ;
+    rdfs:comment "Entangle a target in close combat. Brawl, hack and slash, seize or hold position in battle." .
+
+fitd:Wreck
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Wreck" ;
+    fitd:belongsToAttribute fitd:Prowess ;
+    rdfs:comment "Unleash savage force. Smash doors, use explosives, sabotage, overwhelm with sheer force." .
+
+# --- Resolve actions ---
+fitd:Attune
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Attune" ;
+    fitd:belongsToAttribute fitd:Resolve ;
+    rdfs:comment "Open your mind to arcane power. Communicate with ghosts, perceive beyond normal sight, channel energy." .
+
+fitd:Command
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Command" ;
+    fitd:belongsToAttribute fitd:Resolve ;
+    rdfs:comment "Compel swift obedience. Intimidate, threaten, lead a gang in group action." .
+
+fitd:Consort
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Consort" ;
+    fitd:belongsToAttribute fitd:Resolve ;
+    rdfs:comment "Socialize with friends and contacts. Gain access to resources, information, people, or places." .
+
+fitd:Sway
+    a owl:NamedIndividual, fitd:Action ;
+    rdfs:label "Sway" ;
+    fitd:belongsToAttribute fitd:Resolve ;
+    rdfs:comment "Influence with guile, charm, or argument. Lie convincingly, persuade, argue a compelling case." .
+
+# ============================================================
+# 6. ACTION RATING
+# ============================================================
+
+fitd:ActionRating
+    a owl:Class ;
+    rdfs:label "Action Rating" ;
+    rdfs:comment "A pairing of an Action with its numerical rating (0-4) for a specific Character. Rating 0 means roll 2d and take lowest. Max rating is normally 3; increases to 4 with the Mastery crew upgrade." .
+
+fitd:forAction
+    a owl:ObjectProperty ;
+    rdfs:label "for action" ;
+    rdfs:domain fitd:ActionRating ;
+    rdfs:range fitd:Action ;
+    rdfs:comment "The action this rating applies to." .
+
+fitd:ratingValue
+    a owl:DatatypeProperty ;
+    rdfs:label "rating value" ;
+    rdfs:domain fitd:ActionRating ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Numerical rating from 0 to 4." .
+
+fitd:belongsToAttribute
+    a owl:ObjectProperty ;
+    rdfs:label "belongs to attribute" ;
+    rdfs:domain fitd:Action ;
+    rdfs:range fitd:Attribute ;
+    rdfs:comment "Links an Action to the Attribute it belongs to, for resistance purposes and attribute rating derivation." .
+
+# ============================================================
+# 7. ROLLS — Abstract class and subtypes
+# ============================================================
+
+fitd:Roll
+    a owl:Class ;
+    rdfs:label "Roll" ;
+    rdfs:comment "Abstract superclass for all dice rolls in FITD. The pool is formed by a trait rating in d6s; read the single highest result." .
+
+fitd:hasResult
+    a owl:ObjectProperty ;
+    rdfs:label "has result" ;
+    rdfs:domain fitd:Roll ;
+    rdfs:range fitd:DiceResult ;
+    rdfs:comment "The outcome tier of this roll." .
+
+fitd:dicePool
+    a owl:DatatypeProperty ;
+    rdfs:label "dice pool" ;
+    rdfs:domain fitd:Roll ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of d6s rolled. If 0 or negative, roll 2d and take the lowest; no critical possible." .
+
+fitd:bonusDice
+    a owl:DatatypeProperty ;
+    rdfs:label "bonus dice" ;
+    rdfs:domain fitd:Roll ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Extra dice added from assistance, push yourself, or devil's bargain." .
+
+# --- 7a. Action Roll ---
+fitd:ActionRoll
+    a owl:Class ;
+    rdfs:subClassOf fitd:Roll ;
+    rdfs:label "Action Roll" ;
+    rdfs:comment "Made when a PC does something dangerous or troublesome. Requires a stated goal, chosen action, GM-set position and effect level. Most common roll type; drives the game." .
+
+fitd:usesAction
+    a owl:ObjectProperty ;
+    rdfs:label "uses action" ;
+    rdfs:domain fitd:ActionRoll ;
+    rdfs:range fitd:Action ;
+    rdfs:comment "The action rating used as the dice pool base." .
+
+fitd:hasPosition
+    a owl:ObjectProperty ;
+    rdfs:label "has position" ;
+    rdfs:domain fitd:ActionRoll ;
+    rdfs:range fitd:Position ;
+    rdfs:comment "The risk position set by the GM before the roll." .
+
+fitd:hasEffectLevel
+    a owl:ObjectProperty ;
+    rdfs:label "has effect level" ;
+    rdfs:domain fitd:ActionRoll ;
+    rdfs:range fitd:EffectLevel ;
+    rdfs:comment "The impact level set by the GM, based on potency, quality/tier, and scale." .
+
+fitd:hasGoal
+    a owl:DatatypeProperty ;
+    rdfs:label "has goal" ;
+    rdfs:domain fitd:ActionRoll ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The concrete outcome the character attempts to achieve." .
+
+fitd:earnedXPOnDesperate
+    a owl:DatatypeProperty ;
+    rdfs:label "earned XP on desperate" ;
+    rdfs:domain fitd:ActionRoll ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True when this was a desperate action roll, which triggers 1 XP mark in the relevant attribute track." .
+
+# --- 7b. Fortune Roll ---
+fitd:FortuneRoll
+    a owl:Class ;
+    rdfs:subClassOf fitd:Roll ;
+    rdfs:label "Fortune Roll" ;
+    rdfs:comment "GM tool to disclaim decision-making and leave outcomes to chance. Used when PCs are not directly involved, or when no other roll applies. Pool is any relevant trait rating." .
+
+fitd:fortuneTrait
+    a owl:DatatypeProperty ;
+    rdfs:label "fortune trait" ;
+    rdfs:domain fitd:FortuneRoll ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Description of the trait used as pool (e.g., faction Tier, gang quality, magnitude, character action rating)." .
+
+# --- 7c. Resistance Roll ---
+fitd:ResistanceRoll
+    a owl:Class ;
+    rdfs:subClassOf fitd:Roll ;
+    rdfs:label "Resistance Roll" ;
+    rdfs:comment "Made by a player to resist a consequence they dislike. Always succeeds in reducing or avoiding the consequence. Cost: 6 stress minus the highest die result. Critical clears 1 stress instead." .
+
+fitd:usesAttribute
+    a owl:ObjectProperty ;
+    rdfs:label "uses attribute" ;
+    rdfs:domain fitd:ResistanceRoll ;
+    rdfs:range fitd:Attribute ;
+    rdfs:comment "The attribute used as dice pool, chosen by GM based on consequence type." .
+
+fitd:resistsConsequence
+    a owl:ObjectProperty ;
+    rdfs:label "resists consequence" ;
+    rdfs:domain fitd:ResistanceRoll ;
+    rdfs:range fitd:Consequence ;
+    rdfs:comment "The consequence being reduced or avoided." .
+
+fitd:stressCost
+    a owl:DatatypeProperty ;
+    rdfs:label "stress cost" ;
+    rdfs:domain fitd:ResistanceRoll ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Stress suffered: 6 minus highest die result (minimum 0). On a critical, clear 1 stress." .
+
+# --- 7d. Downtime Roll ---
+fitd:DowntimeRoll
+    a owl:Class ;
+    rdfs:subClassOf fitd:Roll ;
+    rdfs:label "Downtime Roll" ;
+    rdfs:comment "Made during downtime activities: acquire asset, long-term project, recover, reduce heat, train, indulge vice. Coin may be spent 1-for-1 to raise the result level." .
+
+fitd:downtimeActivity
+    a owl:ObjectProperty ;
+    rdfs:label "downtime activity" ;
+    rdfs:domain fitd:DowntimeRoll ;
+    rdfs:range fitd:DowntimeActivity ;
+    rdfs:comment "The downtime activity this roll is resolving." .
+
+# --- 7e. Engagement Roll ---
+fitd:EngagementRoll
+    a owl:Class ;
+    rdfs:subClassOf fitd:FortuneRoll ;
+    rdfs:label "Engagement Roll" ;
+    rdfs:comment "Fortune roll that establishes the starting position when a score begins. Starts at 1d for sheer luck, modified by major advantages/disadvantages. Result sets initial position (1-3: Desperate, 4-5: Risky, 6: Controlled, Critical: beyond first obstacle)." .
+
+fitd:resolvedByScore
+    a owl:ObjectProperty ;
+    rdfs:label "resolved by score" ;
+    rdfs:domain fitd:EngagementRoll ;
+    rdfs:range fitd:Score ;
+    rdfs:comment "The score operation this engagement roll initiates." .
+
+fitd:initialPosition
+    a owl:ObjectProperty ;
+    rdfs:label "initial position" ;
+    rdfs:domain fitd:EngagementRoll ;
+    rdfs:range fitd:Position ;
+    rdfs:comment "The starting position for PC actions, determined by this roll's result." .
+
+# --- 7f. Vice Roll ---
+fitd:ViceRoll
+    a owl:Class ;
+    rdfs:subClassOf fitd:DowntimeRoll ;
+    rdfs:label "Vice Roll" ;
+    rdfs:comment "Roll to relieve stress by indulging vice. Pool equals lowest attribute rating. Clear stress equal to highest die. Clearing more stress than marked causes overindulgence." .
+
+fitd:overindulged
+    a owl:DatatypeProperty ;
+    rdfs:label "overindulged" ;
+    rdfs:domain fitd:ViceRoll ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True when the roll cleared more stress than the character had marked, triggering an overindulgence consequence." .
+
+fitd:stressCleared
+    a owl:DatatypeProperty ;
+    rdfs:label "stress cleared" ;
+    rdfs:domain fitd:ViceRoll ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Amount of stress cleared equal to highest die result." .
+
+# ============================================================
+# 8. BONUS DICE SOURCES
+# ============================================================
+
+fitd:BonusDiceSource
+    a owl:Class ;
+    rdfs:label "Bonus Dice Source" ;
+    rdfs:comment "Enumerated mechanisms by which extra dice are added to a roll. A character may normally receive at most two bonus dice (one from Assist, one from Push Yourself or Devil's Bargain)." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:AssistBonus fitd:PushYourselfBonus fitd:DevilsBargainBonus )
+    ] .
+
+fitd:AssistBonus
+    a owl:NamedIndividual, fitd:BonusDiceSource ;
+    rdfs:label "Assist Bonus" ;
+    rdfs:comment "A teammate describes help and takes 1 stress. Gives +1d. Only one character may assist a given roll." .
+
+fitd:PushYourselfBonus
+    a owl:NamedIndividual, fitd:BonusDiceSource ;
+    rdfs:label "Push Yourself Bonus" ;
+    rdfs:comment "The rolling character takes 2 stress to gain +1d, or +1 effect, or the ability to act when incapacitated." .
+
+fitd:DevilsBargainBonus
+    a owl:NamedIndividual, fitd:BonusDiceSource ;
+    rdfs:label "Devil's Bargain Bonus" ;
+    rdfs:comment "The GM or another player offers +1d in exchange for a complication that occurs regardless of the roll's outcome. Cannot be combined with Push Yourself." .
+
+# ============================================================
+# 9. CONSEQUENCES
+# ============================================================
+
+fitd:Consequence
+    a owl:Class ;
+    rdfs:label "Consequence" ;
+    rdfs:comment "A negative outcome suffered by a PC from enemy actions, dangerous situations, or failed/partial rolls. Five types exist. May be resisted with a resistance roll or negated with armor." .
+
+fitd:consequenceType
+    a owl:ObjectProperty ;
+    rdfs:label "consequence type" ;
+    rdfs:domain fitd:Consequence ;
+    rdfs:range fitd:ConsequenceType ;
+    rdfs:comment "Category of consequence." .
+
+fitd:ConsequenceType
+    a owl:Class ;
+    rdfs:label "Consequence Type" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:ReducedEffect
+            fitd:Complication
+            fitd:LostOpportunity
+            fitd:WorsePosition
+            fitd:HarmConsequence
+        )
+    ] .
+
+fitd:ReducedEffect
+    a owl:NamedIndividual, fitd:ConsequenceType ;
+    rdfs:label "Reduced Effect" ;
+    rdfs:comment "The action's effect is reduced by one level after all other factors." .
+
+fitd:Complication
+    a owl:NamedIndividual, fitd:ConsequenceType ;
+    rdfs:label "Complication" ;
+    rdfs:comment "Trouble, mounting danger, or new threat. Minor: 1 clock tick; Standard: 2 ticks; Serious: 3 ticks. May include +heat, faction status loss, or immediate obstacles." .
+
+fitd:LostOpportunity
+    a owl:NamedIndividual, fitd:ConsequenceType ;
+    rdfs:label "Lost Opportunity" ;
+    rdfs:comment "The window to achieve the goal with this approach has passed. A new approach is needed." .
+
+fitd:WorsePosition
+    a owl:NamedIndividual, fitd:ConsequenceType ;
+    rdfs:label "Worse Position" ;
+    rdfs:comment "The action carries the PC into a more dangerous position. May re-roll at the new, worse position." .
+
+fitd:HarmConsequence
+    a owl:NamedIndividual, fitd:ConsequenceType ;
+    rdfs:label "Harm" ;
+    rdfs:comment "Long-lasting debility. Recorded on the character's harm track at the appropriate level." .
+
+# ============================================================
+# 10. HARM
+# ============================================================
+
+fitd:Harm
+    a owl:Class ;
+    rdfs:label "Harm" ;
+    rdfs:comment "A lasting debility recorded on a character's harm tracker. Levels: 1 (Lesser/Reduced Effect), 2 (Moderate/-1d), 3 (Severe/Need Help), 4 (Fatal/Death). If a row is full, harm escalates to the next level. All harm cleared when healing clock completes." .
+
+fitd:harmLevel
+    a owl:DatatypeProperty ;
+    rdfs:label "harm level" ;
+    rdfs:domain fitd:Harm ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "1=Lesser (Reduced Effect), 2=Moderate (-1d), 3=Severe (Need Help/Incapacitated), 4=Fatal." .
+
+fitd:harmDescription
+    a owl:DatatypeProperty ;
+    rdfs:label "harm description" ;
+    rdfs:domain fitd:Harm ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Narrative description of the harm, e.g. 'Gut Stabbed', 'Shattered Right Leg'." .
+
+fitd:HarmLevel
+    a owl:Class ;
+    rdfs:label "Harm Level" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:LesserHarm fitd:ModerateHarm fitd:SevereHarm fitd:FatalHarm )
+    ] .
+
+fitd:LesserHarm
+    a owl:NamedIndividual, fitd:HarmLevel ;
+    rdfs:label "Lesser Harm (1)" ;
+    rdfs:comment "Level 1. Penalty: Reduced Effect. Examples: Battered, Drained, Distracted, Scared, Confused." .
+
+fitd:ModerateHarm
+    a owl:NamedIndividual, fitd:HarmLevel ;
+    rdfs:label "Moderate Harm (2)" ;
+    rdfs:comment "Level 2. Penalty: -1d on relevant rolls. Examples: Exhausted, Deep Cut, Concussion, Panicked." .
+
+fitd:SevereHarm
+    a owl:NamedIndividual, fitd:HarmLevel ;
+    rdfs:label "Severe Harm (3)" ;
+    rdfs:comment "Level 3. Penalty: Incapacitated/Need Help. Examples: Impaled, Broken Leg, Shot in Chest." .
+
+fitd:FatalHarm
+    a owl:NamedIndividual, fitd:HarmLevel ;
+    rdfs:label "Fatal Harm (4)" ;
+    rdfs:comment "Level 4. Character dies unless resisted. Examples: Electrocuted, Drowned, Stabbed in the Heart." .
+
+# ============================================================
+# 11. ARMOR
+# ============================================================
+
+fitd:Armor
+    a owl:Class ;
+    rdfs:label "Armor" ;
+    rdfs:comment "An armor box that may be marked to reduce or avoid a consequence instead of rolling resistance. All armor restored when load is chosen for the next score." .
+
+fitd:ArmorType
+    a owl:Class ;
+    rdfs:label "Armor Type" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:StandardArmor fitd:HeavyArmor fitd:SpecialArmor )
+    ] .
+
+fitd:StandardArmor
+    a owl:NamedIndividual, fitd:ArmorType ;
+    rdfs:label "Standard Armor" ;
+    rdfs:comment "Basic armor box. Reduces consequence by one level when marked." .
+
+fitd:HeavyArmor
+    a owl:NamedIndividual, fitd:ArmorType ;
+    rdfs:label "Heavy Armor" ;
+    rdfs:comment "Can be marked after standard armor for a second reduction. Increases load." .
+
+fitd:SpecialArmor
+    a owl:NamedIndividual, fitd:ArmorType ;
+    rdfs:label "Special Armor" ;
+    rdfs:comment "Activated by specific special abilities. Negates or reduces consequences of defined types, or enables a push-yourself benefit without stress cost." .
+
+# ============================================================
+# 12. STRESS & TRAUMA
+# ============================================================
+
+fitd:Stress
+    a owl:Class ;
+    rdfs:label "Stress" ;
+    rdfs:comment "A resource PC characters spend or accumulate. Max 9 boxes. Reaching the last box triggers a trauma. Spent to push yourself, assist others (via assist), or resist consequences. Cleared by indulging vice." .
+
+fitd:Trauma
+    a owl:Class ;
+    rdfs:label "Trauma" ;
+    rdfs:comment "A permanent personality condition acquired when a PC marks their last stress box. Circles one trauma condition. Fourth trauma means retirement or imprisonment. Grants XP when it causes trouble." .
+
+fitd:traumaCondition
+    a owl:DatatypeProperty ;
+    rdfs:label "trauma condition" ;
+    rdfs:domain fitd:Trauma ;
+    rdfs:range xsd:string ;
+    rdfs:comment "One of: Cold, Haunted, Obsessed, Paranoid, Reckless, Soft, Unstable, Vicious." .
+
+fitd:TraumaCondition
+    a owl:Class ;
+    rdfs:label "Trauma Condition" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:Cold fitd:Haunted fitd:Obsessed fitd:Paranoid
+            fitd:Reckless fitd:Soft fitd:Unstable fitd:Vicious
+        )
+    ] .
+
+fitd:Cold     a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Cold" ; rdfs:comment "Not moved by emotional appeals or social bonds." .
+fitd:Haunted  a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Haunted" ; rdfs:comment "Often lost in reverie, reliving past horrors, seeing things." .
+fitd:Obsessed a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Obsessed" ; rdfs:comment "Enthralled by one thing: an activity, person, or ideology." .
+fitd:Paranoid a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Paranoid" ; rdfs:comment "Imagines danger everywhere; can't trust others." .
+fitd:Reckless a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Reckless" ; rdfs:comment "Little regard for own safety or best interests." .
+fitd:Soft     a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Soft" ; rdfs:comment "Loses edge; becomes sentimental, passive, gentle." .
+fitd:Unstable a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Unstable" ; rdfs:comment "Volatile emotional state. Can instantly rage, despair, act impulsively, or freeze up." .
+fitd:Vicious  a owl:NamedIndividual, fitd:TraumaCondition ; rdfs:label "Vicious" ; rdfs:comment "Seeks opportunities to hurt people, even for no good reason." .
+
+# ============================================================
+# 13. PROGRESS CLOCK
+# ============================================================
+
+fitd:ProgressClock
+    a owl:Class ;
+    rdfs:label "Progress Clock" ;
+    rdfs:comment "A circle divided into segments (4, 6, or 8 typically) tracking ongoing effort against an obstacle, approach of danger, or progress on a project. Represents the fictional situation, not its cause. Named after the obstacle, not the method." .
+
+fitd:segments
+    a owl:DatatypeProperty ;
+    rdfs:label "segments" ;
+    rdfs:domain fitd:ProgressClock ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Total number of segments. 4=complex obstacle, 6=complicated, 8=daunting/long-term project." .
+
+fitd:filledSegments
+    a owl:DatatypeProperty ;
+    rdfs:label "filled segments" ;
+    rdfs:domain fitd:ProgressClock ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Current number of filled segments." .
+
+fitd:clockType
+    a owl:ObjectProperty ;
+    rdfs:label "clock type" ;
+    rdfs:domain fitd:ProgressClock ;
+    rdfs:range fitd:ClockType ;
+    rdfs:comment "The functional role of this clock in play." .
+
+fitd:ClockType
+    a owl:Class ;
+    rdfs:label "Clock Type" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:DangerClock fitd:RacingClock fitd:LinkedClock
+            fitd:MissionClock fitd:TugOfWarClock fitd:LongTermProjectClock
+            fitd:FactionClock fitd:HealingClock
+        )
+    ] .
+
+fitd:DangerClock       a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Danger Clock" ; rdfs:comment "Tracks progressive danger: alert level, pursuing force. Ticked on complications. Full = danger materialises." .
+fitd:RacingClock       a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Racing Clock" ; rdfs:comment "Two opposed clocks. First to fill wins the race. Also used for environmental hazards." .
+fitd:LinkedClock       a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Linked Clock" ; rdfs:comment "A clock unlocked by filling another clock. Represents layered defences or multi-stage challenges." .
+fitd:MissionClock      a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Mission Clock" ; rdfs:comment "Countdown representing a time-sensitive window of opportunity. If it fills before PCs finish, mission fails." .
+fitd:TugOfWarClock     a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Tug-of-War Clock" ; rdfs:comment "Can be ticked both up and down. Represents back-and-forth struggles like a revolution or turf war." .
+fitd:LongTermProjectClock a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Long-Term Project Clock" ; rdfs:comment "Tracks multi-downtime effort. Basic: 8 segments. Complex may span multiple clocks." .
+fitd:FactionClock      a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Faction Clock" ; rdfs:comment "Represents an NPC faction's long-term goal. Ticked during downtime by GM." .
+fitd:HealingClock      a owl:NamedIndividual, fitd:ClockType ; rdfs:label "Healing Clock" ; rdfs:comment "Tracks recovery progress. Normally 4 segments. Filling it reduces all harm by one level." .
+
+fitd:linkedTo
+    a owl:ObjectProperty ;
+    rdfs:label "linked to" ;
+    rdfs:domain fitd:ProgressClock ;
+    rdfs:range fitd:ProgressClock ;
+    rdfs:comment "For Linked Clocks: the clock that is unlocked when this clock fills." .
+
+# ============================================================
+# 14. GATHERING INFORMATION
+# ============================================================
+
+fitd:GatherInformation
+    a owl:Class ;
+    rdfs:label "Gather Information" ;
+    rdfs:comment "A structured technique for players to learn specific things about the fictional world. Requires stating a question and performing an action roll or fortune roll. Effect level determines detail quality." .
+
+fitd:informationQuestion
+    a owl:DatatypeProperty ;
+    rdfs:label "information question" ;
+    rdfs:domain fitd:GatherInformation ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The specific question the character is trying to answer." .
+
+fitd:informationQuality
+    a owl:ObjectProperty ;
+    rdfs:label "information quality" ;
+    rdfs:domain fitd:GatherInformation ;
+    rdfs:range fitd:EffectLevel ;
+    rdfs:comment "Great: complete details + follow-up. Standard: good details. Limited: partial, more gathering needed." .
+
+# ============================================================
+# 15. GAME STRUCTURE — Phases
+# ============================================================
+
+fitd:GamePhase
+    a owl:Class ;
+    rdfs:label "Game Phase" ;
+    rdfs:comment "The four phases of a FITD session. They cycle continuously and signal which mechanics are active." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:FreePlay fitd:ScorePhase fitd:DowntimePhase fitd:EngagementPhase )
+    ] .
+
+fitd:FreePlay
+    a owl:NamedIndividual, fitd:GamePhase ;
+    rdfs:label "Free Play" ;
+    rdfs:comment "Default phase. Characters talk, go places, do things. Rolls as needed. No structured constraints." .
+
+fitd:EngagementPhase
+    a owl:NamedIndividual, fitd:GamePhase ;
+    rdfs:label "Engagement Phase" ;
+    rdfs:comment "Transition phase: crew chooses target and plan type, then makes the engagement roll to cut to the action." .
+
+fitd:ScorePhase
+    a owl:NamedIndividual, fitd:GamePhase ;
+    rdfs:label "Score Phase" ;
+    rdfs:comment "Active operation phase. PCs engage target, make rolls, overcome obstacles, use flashbacks, teamwork. Ends when operation concludes (success or failure)." .
+
+fitd:DowntimePhase
+    a owl:NamedIndividual, fitd:GamePhase ;
+    rdfs:label "Downtime Phase" ;
+    rdfs:comment "Post-score recovery phase. Resolves in order: Payoff, Heat, Entanglements, Downtime Activities. Returns to Free Play when complete." .
+
+# ============================================================
+# 16. SCORE
+# ============================================================
+
+fitd:Score
+    a owl:Class ;
+    rdfs:label "Score" ;
+    rdfs:comment "A single operation with a particular criminal goal. Initiated by choosing a plan type and providing the required detail. Three categories: criminal activity, seizing a crew claim, or special mission." .
+
+fitd:ScoreType
+    a owl:Class ;
+    rdfs:label "Score Type" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:CriminalActivity fitd:ClaimSeizure fitd:SpecialMission )
+    ] .
+
+fitd:CriminalActivity a owl:NamedIndividual, fitd:ScoreType ; rdfs:label "Criminal Activity" ; rdfs:comment "Core score type determined by crew type (assassination, burglary, smuggling, etc.)." .
+fitd:ClaimSeizure     a owl:NamedIndividual, fitd:ScoreType ; rdfs:label "Claim Seizure" ; rdfs:comment "Operation specifically to seize a claim from another faction on the crew's claim map." .
+fitd:SpecialMission   a owl:NamedIndividual, fitd:ScoreType ; rdfs:label "Special Mission" ; rdfs:comment "Player-defined goal not covered by criminal activity or claim seizure." .
+
+fitd:scoreType
+    a owl:ObjectProperty ;
+    rdfs:label "score type" ;
+    rdfs:domain fitd:Score ;
+    rdfs:range fitd:ScoreType .
+
+fitd:scorePlan
+    a owl:ObjectProperty ;
+    rdfs:label "score plan" ;
+    rdfs:domain fitd:Score ;
+    rdfs:range fitd:Plan ;
+    rdfs:comment "The plan type chosen by the crew for this score." .
+
+fitd:scoreOutcome
+    a owl:ObjectProperty ;
+    rdfs:label "score outcome" ;
+    rdfs:domain fitd:Score ;
+    rdfs:range fitd:ScoreOutcome .
+
+fitd:ScoreOutcome
+    a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:ScoreSuccess fitd:ScoreFailure fitd:ScoreAbandoned )
+    ] .
+
+fitd:ScoreSuccess   a owl:NamedIndividual, fitd:ScoreOutcome ; rdfs:label "Success" .
+fitd:ScoreFailure   a owl:NamedIndividual, fitd:ScoreOutcome ; rdfs:label "Failure" .
+fitd:ScoreAbandoned a owl:NamedIndividual, fitd:ScoreOutcome ; rdfs:label "Abandoned" ; rdfs:comment "Crew gives up. Zero payoff but still face heat and entanglements." .
+
+# ============================================================
+# 17. PLAN TYPES
+# ============================================================
+
+fitd:Plan
+    a owl:Class ;
+    rdfs:label "Plan" ;
+    rdfs:comment "The crew's chosen approach for a score. Choosing a plan and supplying its required detail replaces nitty-gritty planning; the engagement roll handles the rest." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:AssaultPlan fitd:DeceptionPlan fitd:StealthPlan
+            fitd:OccultPlan fitd:SocialPlan fitd:TransportPlan
+        )
+    ] .
+
+fitd:AssaultPlan    a owl:NamedIndividual, fitd:Plan ; rdfs:label "Assault" ; rdfs:comment "Do violence to a target. Required detail: the point of attack." .
+fitd:DeceptionPlan  a owl:NamedIndividual, fitd:Plan ; rdfs:label "Deception" ; rdfs:comment "Lure, trick, or manipulate. Required detail: the method of deception." .
+fitd:StealthPlan    a owl:NamedIndividual, fitd:Plan ; rdfs:label "Stealth" ; rdfs:comment "Trespass unseen. Required detail: the point of infiltration." .
+fitd:OccultPlan     a owl:NamedIndividual, fitd:Plan ; rdfs:label "Occult" ; rdfs:comment "Engage a supernatural power. Required detail: the arcane method." .
+fitd:SocialPlan     a owl:NamedIndividual, fitd:Plan ; rdfs:label "Social" ; rdfs:comment "Negotiate, bargain, or persuade. Required detail: the social connection." .
+fitd:TransportPlan  a owl:NamedIndividual, fitd:Plan ; rdfs:label "Transport" ; rdfs:comment "Carry cargo or people through danger. Required detail: the route and means." .
+
+fitd:planDetail
+    a owl:DatatypeProperty ;
+    rdfs:label "plan detail" ;
+    rdfs:domain fitd:Plan ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The required specific detail supplied by players (e.g., point of attack, method of deception, route)." .
+
+# ============================================================
+# 18. FLASHBACK
+# ============================================================
+
+fitd:Flashback
+    a owl:Class ;
+    rdfs:label "Flashback" ;
+    rdfs:comment "An action in the fictional past invoked during a score to affect the current situation. Costs stress (0-2+) set by GM. May require an action roll, fortune roll, or just the stress payment. Cannot undo established present-moment fiction." .
+
+fitd:flashbackStressCost
+    a owl:DatatypeProperty ;
+    rdfs:label "flashback stress cost" ;
+    rdfs:domain fitd:Flashback ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "0: ordinary action with easy opportunity. 1: complex action or unlikely opportunity. 2+: elaborate action with special contingencies. Downtime activities in flashback cost 1 coin or 1 rep instead." .
+
+fitd:flashbackDescription
+    a owl:DatatypeProperty ;
+    rdfs:label "flashback description" ;
+    rdfs:domain fitd:Flashback ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Narrative description of the past action." .
+
+fitd:requiresRoll
+    a owl:DatatypeProperty ;
+    rdfs:label "requires roll" ;
+    rdfs:domain fitd:Flashback ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True if the flashback requires an action or fortune roll; false if stress payment alone suffices." .
+
+# ============================================================
+# 19. TEAMWORK MANEUVERS
+# ============================================================
+
+fitd:TeamworkManeuver
+    a owl:Class ;
+    rdfs:label "Teamwork Maneuver" ;
+    rdfs:comment "One of four special techniques available when PCs work together during a score." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:Assist fitd:GroupAction fitd:Protect fitd:SetUp )
+    ] .
+
+fitd:Assist
+    a owl:NamedIndividual, fitd:TeamworkManeuver ;
+    rdfs:label "Assist" ;
+    rdfs:comment "Describe help, take 1 stress, give +1d to another PC's roll. Only one character may assist a given roll. May suffer consequences from the roll." .
+
+fitd:GroupAction
+    a owl:NamedIndividual, fitd:TeamworkManeuver ;
+    rdfs:label "Group Action" ;
+    rdfs:comment "Multiple PCs roll the same action. Best single result counts for everyone. Leader takes 1 stress per 1-3 result rolled by participants." .
+
+fitd:Protect
+    a owl:NamedIndividual, fitd:TeamworkManeuver ;
+    rdfs:label "Protect" ;
+    rdfs:comment "Step in to face a consequence in place of a teammate. Suffer it instead; may roll to resist as normal." .
+
+fitd:SetUp
+    a owl:NamedIndividual, fitd:TeamworkManeuver ;
+    rdfs:label "Set Up" ;
+    rdfs:comment "Indirect effect on an obstacle. Success gives following PCs +1 effect level or improved position. Multiple follow-ups may benefit from one setup." .
+
+# ============================================================
+# 20. DOWNTIME ACTIVITIES
+# ============================================================
+
+fitd:DowntimeActivity
+    a owl:Class ;
+    rdfs:label "Downtime Activity" ;
+    rdfs:comment "A structured action available during downtime. Each PC has two free activities per downtime. Additional activities cost 1 coin or 1 rep each. At war: only one activity per PC." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:AcquireAsset fitd:LongTermProject fitd:Recover
+            fitd:ReduceHeat fitd:Train fitd:IndulgeVice
+        )
+    ] .
+
+fitd:AcquireAsset
+    a owl:NamedIndividual, fitd:DowntimeActivity ;
+    rdfs:label "Acquire Asset" ;
+    rdfs:comment "Roll crew Tier for temporary use of an item, cohort, vehicle, or service. Result: Crit=Tier+2, 6=Tier+1, 4/5=Tier, 1-3=Tier-1. Coin spent 2-for-1 to exceed Tier+2." .
+
+fitd:LongTermProject
+    a owl:NamedIndividual, fitd:DowntimeActivity ;
+    rdfs:label "Long-Term Project" ;
+    rdfs:comment "Work on a project clock by rolling an action. Ticks: Crit=5, 6=3, 4/5=2, 1-3=1." .
+
+fitd:Recover
+    a owl:NamedIndividual, fitd:DowntimeActivity ;
+    rdfs:label "Recover" ;
+    rdfs:comment "Seek treatment to tick healing clock. Roll healer's quality/Tinker. Same ticks as long-term project. Filling clock reduces all harm by one level." .
+
+fitd:ReduceHeat
+    a owl:NamedIndividual, fitd:DowntimeActivity ;
+    rdfs:label "Reduce Heat" ;
+    rdfs:comment "Perform an action to reduce crew heat. Roll action. Heat cleared: Crit=5, 6=3, 4/5=2, 1-3=1." .
+
+fitd:Train
+    a owl:NamedIndividual, fitd:DowntimeActivity ;
+    rdfs:label "Train" ;
+    rdfs:comment "Mark 1 XP in an attribute or playbook track. +1 XP with appropriate crew training upgrade. Each track trainable only once per downtime." .
+
+fitd:IndulgeVice
+    a owl:NamedIndividual, fitd:DowntimeActivity ;
+    rdfs:label "Indulge Vice" ;
+    rdfs:comment "Visit vice purveyor. Roll lowest attribute rating. Clear stress equal to highest die. Overindulge if clearing more than marked stress." .
+
+# ============================================================
+# 21. PAYOFF, HEAT, WANTED LEVEL, ENTANGLEMENTS
+# ============================================================
+
+fitd:Payoff
+    a owl:Class ;
+    rdfs:label "Payoff" ;
+    rdfs:comment "Post-score income. Default: 2 rep. +1 rep per Tier the target exceeds the crew; -1 rep per Tier below (min 0). Coin based on operation scale (2-10+). Zero rep if kept completely quiet." .
+
+fitd:payoffCoin
+    a owl:DatatypeProperty ;
+    rdfs:label "payoff coin" ;
+    rdfs:domain fitd:Payoff ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Coin earned: 2 (minor), 4 (small), 6 (standard), 8 (big), 10+ (major)." .
+
+fitd:payoffRep
+    a owl:DatatypeProperty ;
+    rdfs:label "payoff rep" ;
+    rdfs:domain fitd:Payoff ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Reputation earned. Base 2, adjusted by Tier differential." .
+
+fitd:Heat
+    a owl:Class ;
+    rdfs:label "Heat" ;
+    rdfs:comment "Crew's suspicion and attention from authorities. Tracked 0-9. At 9, gain a wanted level and clear heat. Contributes to entanglement severity. Sources: operation type (0/2/4/6), +1 high-profile target, +1 hostile turf, +1 at war, +2 killing involved." .
+
+fitd:heatValue
+    a owl:DatatypeProperty ;
+    rdfs:label "heat value" ;
+    rdfs:domain fitd:Heat ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Current heat level 0-9." .
+
+fitd:WantedLevel
+    a owl:Class ;
+    rdfs:label "Wanted Level" ;
+    rdfs:comment "Escalating law enforcement threat (0-4). Gained when heat reaches 9. Reduced only via incarceration. Higher wanted level increases entanglement severity and law enforcement quality/scale response." .
+
+fitd:wantedLevelValue
+    a owl:DatatypeProperty ;
+    rdfs:label "wanted level value" ;
+    rdfs:domain fitd:WantedLevel ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "0-4. Level 4: life sentence or execution." .
+
+fitd:Entanglement
+    a owl:Class ;
+    rdfs:label "Entanglement" ;
+    rdfs:comment "Post-score complication from rivals, law, or the world. Determined by heat level and wanted level. Types include Arrest, Cooperation, Demonic Notice, Flipped, Gang Trouble, Interrogation, Questioning, Reprisals, Rivals, Show of Force, Unquiet Dead, Usual Suspects." .
+
+fitd:entanglementType
+    a owl:DatatypeProperty ;
+    rdfs:label "entanglement type" ;
+    rdfs:domain fitd:Entanglement ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Named entanglement type, e.g. Arrest, Cooperation, Demonic Notice, Flipped, Gang Trouble, etc." .
+
+# ============================================================
+# 22. VICE
+# ============================================================
+
+fitd:Vice
+    a owl:Class ;
+    rdfs:label "Vice" ;
+    rdfs:comment "A character's obsession, indulged during downtime to clear stress. Types: Faith, Gambling, Luxury, Obligation, Pleasure, Stupor, Weird. Not indulging costs stress equal to trauma count." .
+
+fitd:ViceType
+    a owl:Class ;
+    rdfs:label "Vice Type" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:FaithVice fitd:GamblingVice fitd:LuxuryVice fitd:ObligationVice
+            fitd:PleasureVice fitd:StuporVice fitd:WeirdVice
+        )
+    ] .
+
+fitd:FaithVice      a owl:NamedIndividual, fitd:ViceType ; rdfs:label "Faith" .
+fitd:GamblingVice   a owl:NamedIndividual, fitd:ViceType ; rdfs:label "Gambling" .
+fitd:LuxuryVice     a owl:NamedIndividual, fitd:ViceType ; rdfs:label "Luxury" .
+fitd:ObligationVice a owl:NamedIndividual, fitd:ViceType ; rdfs:label "Obligation" .
+fitd:PleasureVice   a owl:NamedIndividual, fitd:ViceType ; rdfs:label "Pleasure" .
+fitd:StuporVice     a owl:NamedIndividual, fitd:ViceType ; rdfs:label "Stupor" .
+fitd:WeirdVice      a owl:NamedIndividual, fitd:ViceType ; rdfs:label "Weird" .
+
+fitd:viceType
+    a owl:ObjectProperty ;
+    rdfs:label "vice type" ;
+    rdfs:domain fitd:Vice ;
+    rdfs:range fitd:ViceType .
+
+fitd:vicePurveyor
+    a owl:DatatypeProperty ;
+    rdfs:label "vice purveyor" ;
+    rdfs:domain fitd:Vice ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Name and location of the NPC or place where the vice is satisfied." .
+
+fitd:OverindulgenceConsequence
+    a owl:Class ;
+    rdfs:label "Overindulgence Consequence" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:AttractTrouble fitd:Brag fitd:Lost fitd:Tapped )
+    ] .
+
+fitd:AttractTrouble a owl:NamedIndividual, fitd:OverindulgenceConsequence ; rdfs:label "Attract Trouble" ; rdfs:comment "Roll an additional entanglement." .
+fitd:Brag           a owl:NamedIndividual, fitd:OverindulgenceConsequence ; rdfs:label "Brag" ; rdfs:comment "+2 heat from boasting." .
+fitd:Lost           a owl:NamedIndividual, fitd:OverindulgenceConsequence ; rdfs:label "Lost" ; rdfs:comment "Character vanishes for weeks; play alternate. Returns having healed all harm." .
+fitd:Tapped         a owl:NamedIndividual, fitd:OverindulgenceConsequence ; rdfs:label "Tapped" ; rdfs:comment "Current vice purveyor cuts off the character; must find a new source." .
+
+# ============================================================
+# 23. ADVANCEMENT — XP & Advances
+# ============================================================
+
+fitd:XPTrack
+    a owl:Class ;
+    rdfs:label "XP Track" ;
+    rdfs:comment "Experience tracker for a character attribute or playbook. When filled, cleared and an advance taken. Advance from playbook = new special ability. Advance from attribute = +1 action dot under that attribute." .
+
+fitd:XPTrigger
+    a owl:Class ;
+    rdfs:label "XP Trigger" ;
+    rdfs:comment "A condition that, when met during or at end of session, grants 1-2 XP. Standard triggers: desperate action roll (1 XP in attribute), expressed beliefs/drives/heritage/background (1-2 XP), struggled with vice/trauma (1-2 XP), playbook-specific trigger (1-2 XP)." .
+
+fitd:xpTriggerDescription
+    a owl:DatatypeProperty ;
+    rdfs:label "xp trigger description" ;
+    rdfs:domain fitd:XPTrigger ;
+    rdfs:range xsd:string .
+
+fitd:CrewXPTrigger
+    a owl:Class ;
+    rdfs:subClassOf fitd:XPTrigger ;
+    rdfs:label "Crew XP Trigger" ;
+    rdfs:comment "End-of-session crew advancement triggers: crew-specific trigger, contending with challenges above station, bolstering reputation, expressing crew goals/nature." .
+
+fitd:CrewAdvance
+    a owl:Class ;
+    rdfs:label "Crew Advance" ;
+    rdfs:comment "When crew XP tracker fills: take a new crew special ability OR mark two crew upgrade boxes." .
+
+# ============================================================
+# 24. LOAD & ITEMS
+# ============================================================
+
+fitd:Load
+    a owl:Class ;
+    rdfs:label "Load" ;
+    rdfs:comment "The amount of gear a character carries on a score. Chosen before the operation; determines which items are available. Affects movement speed and conspicuousness." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:LightLoad fitd:NormalLoad fitd:HeavyLoad fitd:EncumberedLoad )
+    ] .
+
+fitd:LightLoad      a owl:NamedIndividual, fitd:Load ; rdfs:label "Light (1-3)" ; rdfs:comment "Faster, less conspicuous; blend with citizens." .
+fitd:NormalLoad     a owl:NamedIndividual, fitd:Load ; rdfs:label "Normal (4-5)" ; rdfs:comment "Look like a scoundrel, ready for trouble." .
+fitd:HeavyLoad      a owl:NamedIndividual, fitd:Load ; rdfs:label "Heavy (6)" ; rdfs:comment "Slower. Look like an operative on a mission." .
+fitd:EncumberedLoad a owl:NamedIndividual, fitd:Load ; rdfs:label "Encumbered (7-9)" ; rdfs:comment "Overburdened; can only move very slowly." .
+
+fitd:Item
+    a owl:Class ;
+    rdfs:label "Item" ;
+    rdfs:comment "Equipment a character may carry. Each item occupies load slots. Fine items grant +1 quality bonus stacking with Tier." .
+
+fitd:itemQuality
+    a owl:DatatypeProperty ;
+    rdfs:label "item quality" ;
+    rdfs:domain fitd:Item ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Quality level 0-6. Fine items add +1 quality." .
+
+fitd:isFine
+    a owl:DatatypeProperty ;
+    rdfs:label "is fine" ;
+    rdfs:domain fitd:Item ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True if item is Fine quality (+1 quality bonus stacking with Tier)." .
+
+fitd:loadCost
+    a owl:DatatypeProperty ;
+    rdfs:label "load cost" ;
+    rdfs:domain fitd:Item ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of load slots this item occupies (typically 1 or 2; 0 for italicised items that don't count toward load)." .
+
+# ============================================================
+# 25. ACTOR (Character & Cohort common base)
+# ============================================================
+
+fitd:Actor
+    a owl:Class ;
+    rdfs:label "Actor" ;
+    rdfs:comment "Abstract base class for any entity that can take actions in the fiction: player characters and cohorts." .
+
+# ============================================================
+# 26. CHARACTER
+# ============================================================
+
+fitd:Character
+    a owl:Class ;
+    rdfs:subClassOf fitd:Actor ;
+    rdfs:label "Character" ;
+    rdfs:comment "A player character (PC). Has a playbook, action ratings, attribute ratings, stress track, trauma, harm, vice, load, items, XP tracks, special abilities, coin, and stash." .
+
+fitd:hasPlaybook
+    a owl:ObjectProperty ;
+    rdfs:label "has playbook" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:Playbook .
+
+fitd:hasActionRating
+    a owl:ObjectProperty ;
+    rdfs:label "has action rating" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:ActionRating .
+
+fitd:currentStress
+    a owl:DatatypeProperty ;
+    rdfs:label "current stress" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Current stress boxes marked. Max 9. Reaching 9+: take trauma." .
+
+fitd:traumaCount
+    a owl:DatatypeProperty ;
+    rdfs:label "trauma count" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of trauma conditions marked. At 4: character must retire or go to prison." .
+
+fitd:hasTrauma
+    a owl:ObjectProperty ;
+    rdfs:label "has trauma" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:TraumaCondition .
+
+fitd:hasHarm
+    a owl:ObjectProperty ;
+    rdfs:label "has harm" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:Harm .
+
+fitd:hasVice
+    a owl:ObjectProperty ;
+    rdfs:label "has vice" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:Vice .
+
+fitd:hasLoad
+    a owl:ObjectProperty ;
+    rdfs:label "has load" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:Load .
+
+fitd:coin
+    a owl:DatatypeProperty ;
+    rdfs:label "coin" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Liquid coin available to the character. Abstract measure of cash." .
+
+fitd:stash
+    a owl:DatatypeProperty ;
+    rdfs:label "stash" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Long-term savings (0-40). Determines lifestyle quality and retirement outcome. Each 10 stash = 1 lifestyle quality level." .
+
+fitd:heritage
+    a owl:DatatypeProperty ;
+    rdfs:label "heritage" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Family line background. Informs one starting action dot." .
+
+fitd:background
+    a owl:DatatypeProperty ;
+    rdfs:label "background" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Pre-crew history. Informs one starting action dot." .
+
+# ============================================================
+# 27. PLAYBOOK
+# ============================================================
+
+fitd:Playbook
+    a owl:Class ;
+    rdfs:label "Playbook" ;
+    rdfs:comment "Character type template. Defines starting action ratings, available special abilities, XP triggers, contact list, items, and advancement track. Not a class/archetype—represents focus and preference, not immutable nature." .
+
+fitd:SpecialAbility
+    a owl:Class ;
+    rdfs:label "Special Ability" ;
+    rdfs:comment "A rule-breaking power tied to a playbook or crew. Chosen at character creation and gained via advances. May grant bonus dice, special armor uses, push-yourself options, unique mechanics, or immunity to certain effects." .
+
+fitd:specialAbilityDescription
+    a owl:DatatypeProperty ;
+    rdfs:label "special ability description" ;
+    rdfs:domain fitd:SpecialAbility ;
+    rdfs:range xsd:string .
+
+fitd:hasSpecialAbility
+    a owl:ObjectProperty ;
+    rdfs:label "has special ability" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:SpecialAbility .
+
+# ============================================================
+# 28. COHORT
+# ============================================================
+
+fitd:Cohort
+    a owl:Class ;
+    rdfs:subClassOf fitd:Actor ;
+    rdfs:label "Cohort" ;
+    rdfs:comment "A gang or single expert NPC who works for the crew. Acquired as a crew upgrade. Has quality rating, scale, type, and flaw(s). Rolls its quality level for actions. Suffers harm in 4 levels. Breaks at level 3 unless abilities prevent it." .
+
+fitd:CohortType
+    a owl:Class ;
+    rdfs:label "Cohort Type" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:Gang fitd:Expert )
+    ] .
+
+fitd:Gang   a owl:NamedIndividual, fitd:CohortType ; rdfs:label "Gang" ; rdfs:comment "A group of NPCs. Quality equals crew Tier. Scale varies by tier." .
+fitd:Expert a owl:NamedIndividual, fitd:CohortType ; rdfs:label "Expert" ; rdfs:comment "A single skilled NPC. Quality equals crew Tier." .
+
+fitd:cohortType
+    a owl:ObjectProperty ;
+    rdfs:label "cohort type" ;
+    rdfs:domain fitd:Cohort ;
+    rdfs:range fitd:CohortType .
+
+fitd:cohortQuality
+    a owl:DatatypeProperty ;
+    rdfs:label "cohort quality" ;
+    rdfs:domain fitd:Cohort ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Quality/effectiveness level, usually equal to crew Tier." .
+
+fitd:cohortScale
+    a owl:DatatypeProperty ;
+    rdfs:label "cohort scale" ;
+    rdfs:domain fitd:Cohort ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Size description (1-2, 3-6 small, 12 medium, 20 large, 40 huge, 80 massive)." .
+
+fitd:cohortFlaw
+    a owl:DatatypeProperty ;
+    rdfs:label "cohort flaw" ;
+    rdfs:domain fitd:Cohort ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The weakness or problem that triggers gang trouble entanglements." .
+
+fitd:cohortEdge
+    a owl:DatatypeProperty ;
+    rdfs:label "cohort edge" ;
+    rdfs:domain fitd:Cohort ;
+    rdfs:range xsd:string ;
+    rdfs:comment "A specialty area where the cohort excels (+1 effect)." .
+
+# ============================================================
+# 29. CREW
+# ============================================================
+
+fitd:Crew
+    a owl:Class ;
+    rdfs:label "Crew" ;
+    rdfs:comment "The group entity players build together. Has type, Tier, hold, rep, heat, wanted level, coin, lair, hunting grounds, claims, cohorts, and special abilities. Starts at Tier 0, strong hold, 2 coin, 0 rep." .
+
+fitd:crewType
+    a owl:DatatypeProperty ;
+    rdfs:label "crew type" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Criminal enterprise type (e.g. Assassins, Smugglers, Bravos, Cult). Determines available scores, special abilities, and underworld reputation." .
+
+fitd:tier
+    a owl:DatatypeProperty ;
+    rdfs:label "tier" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Measure of wealth, influence, and scale. 0-6 (0-IV typically for PCs). Determines item quality, gang scale, and advancement costs." .
+
+fitd:hold
+    a owl:ObjectProperty ;
+    rdfs:label "hold" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range fitd:Hold ;
+    rdfs:comment "Strength of the crew's grip on its current Tier position." .
+
+fitd:Hold
+    a owl:Class ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:WeakHold fitd:StrongHold )
+    ] .
+
+fitd:WeakHold   a owl:NamedIndividual, fitd:Hold ; rdfs:label "Weak Hold" ; rdfs:comment "Vulnerable position. Losing hold at Tier 0 weak = loss of lair. At war: temporary loss of hold." .
+fitd:StrongHold a owl:NamedIndividual, fitd:Hold ; rdfs:label "Strong Hold" ; rdfs:comment "Stable position. Can pay to increase Tier (costs new Tier × 8 coin), which drops hold to weak." .
+
+fitd:rep
+    a owl:DatatypeProperty ;
+    rdfs:label "rep" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Reputation points. Earn 2 rep per score ±Tier differential. Fill tracker (12, minus turf) to develop: strengthen hold or pay to increase Tier." .
+
+fitd:turf
+    a owl:DatatypeProperty ;
+    rdfs:label "turf" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Held territory pieces (max 6). Each turf reduces rep needed to develop by 1. Marked on rep tracker; kept when developing." .
+
+fitd:crewCoin
+    a owl:DatatypeProperty ;
+    rdfs:label "crew coin" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Crew treasury. Max stored: 4 (8 with vault upgrade, 16 with second vault)." .
+
+fitd:crewReputation
+    a owl:DatatypeProperty ;
+    rdfs:label "crew reputation" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The crew's reputation in the underworld (e.g. Ambitious, Brutal, Daring, Honorable, Professional, Savvy, Subtle, Strange)." .
+
+fitd:lair
+    a owl:DatatypeProperty ;
+    rdfs:label "lair" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Location and description of the crew's base of operations." .
+
+fitd:huntingGrounds
+    a owl:DatatypeProperty ;
+    rdfs:label "hunting grounds" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The preferred operational territory. Grants +1d gather information and a free downtime activity for preferred operation type." .
+
+fitd:hasCohort
+    a owl:ObjectProperty ;
+    rdfs:label "has cohort" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range fitd:Cohort .
+
+fitd:hasCrewSpecialAbility
+    a owl:ObjectProperty ;
+    rdfs:label "has crew special ability" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range fitd:SpecialAbility .
+
+fitd:hasUpgrade
+    a owl:ObjectProperty ;
+    rdfs:label "has upgrade" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range fitd:CrewUpgrade .
+
+fitd:hasClaim
+    a owl:ObjectProperty ;
+    rdfs:label "has claim" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range fitd:Claim .
+
+fitd:crewHeat
+    a owl:DatatypeProperty ;
+    rdfs:label "crew heat" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Current heat value 0-9." .
+
+fitd:crewWantedLevel
+    a owl:DatatypeProperty ;
+    rdfs:label "crew wanted level" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Wanted level 0-4." .
+
+fitd:hasMember
+    a owl:ObjectProperty ;
+    rdfs:label "has member" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range fitd:Character .
+
+# ============================================================
+# 30. CREW UPGRADE
+# ============================================================
+
+fitd:CrewUpgrade
+    a owl:Class ;
+    rdfs:label "Crew Upgrade" ;
+    rdfs:comment "A valuable asset or training that improves the crew. Selected during crew creation (4 total) and gained via crew advances (2 upgrade boxes per advance). Examples: Boat House, Carriage House, Cohort, Hidden Lair, Mastery, Quality, Quarters, Secure Lair, Vault, Workshop." .
+
+fitd:upgradeName
+    a owl:DatatypeProperty ;
+    rdfs:label "upgrade name" ;
+    rdfs:domain fitd:CrewUpgrade ;
+    rdfs:range xsd:string .
+
+fitd:upgradeDescription
+    a owl:DatatypeProperty ;
+    rdfs:label "upgrade description" ;
+    rdfs:domain fitd:CrewUpgrade ;
+    rdfs:range xsd:string .
+
+# ============================================================
+# 31. FACTION SYSTEM
+# ============================================================
+
+fitd:Faction
+    a owl:Class ;
+    rdfs:label "Faction" ;
+    rdfs:comment "A notable NPC organization ranked by Tier (0-VI). Has its own goals (faction clocks), hold, and status relationships with other factions and the crew." .
+
+fitd:factionName
+    a owl:DatatypeProperty ;
+    rdfs:label "faction name" ;
+    rdfs:domain fitd:Faction ;
+    rdfs:range xsd:string .
+
+fitd:factionTier
+    a owl:DatatypeProperty ;
+    rdfs:label "faction tier" ;
+    rdfs:domain fitd:Faction ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Power and influence level 0-VI." .
+
+fitd:factionHold
+    a owl:ObjectProperty ;
+    rdfs:label "faction hold" ;
+    rdfs:domain fitd:Faction ;
+    rdfs:range fitd:Hold .
+
+fitd:FactionRelationship
+    a owl:Class ;
+    rdfs:label "Faction Relationship" ;
+    rdfs:comment "Ternary relationship recording the status between two factions or between a faction and the PC crew. Status -3 (War) to +3 (Allies)." .
+
+fitd:fromFaction
+    a owl:ObjectProperty ;
+    rdfs:label "from faction" ;
+    rdfs:domain fitd:FactionRelationship ;
+    rdfs:range fitd:Faction .
+
+fitd:toFaction
+    a owl:ObjectProperty ;
+    rdfs:label "to faction" ;
+    rdfs:domain fitd:FactionRelationship ;
+    rdfs:range fitd:Faction .
+
+fitd:statusValue
+    a owl:DatatypeProperty ;
+    rdfs:label "status value" ;
+    rdfs:domain fitd:FactionRelationship ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "-3=War, -2=Hostile, -1=Interfering, 0=Neutral, +1=Helpful, +2=Friendly, +3=Allies." .
+
+fitd:FactionStatus
+    a owl:Class ;
+    rdfs:label "Faction Status Level" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:War fitd:Hostile fitd:Interfering fitd:Neutral
+            fitd:Helpful fitd:Friendly fitd:Allies
+        )
+    ] .
+
+fitd:War          a owl:NamedIndividual, fitd:FactionStatus ; rdfs:label "War (-3)" ; rdfs:comment "Goes out of its way to hurt you. Crew: +1 heat from scores, -1 hold, only 1 downtime action per PC." .
+fitd:Hostile      a owl:NamedIndividual, fitd:FactionStatus ; rdfs:label "Hostile (-2)" ; rdfs:comment "Looks to hurt you when it doesn't create serious problems for them." .
+fitd:Interfering  a owl:NamedIndividual, fitd:FactionStatus ; rdfs:label "Interfering (-1)" ; rdfs:comment "Looks for opportunities to cause trouble or profit from your misfortune." .
+fitd:Neutral      a owl:NamedIndividual, fitd:FactionStatus ; rdfs:label "Neutral (0)" ; rdfs:comment "Default starting status." .
+fitd:Helpful      a owl:NamedIndividual, fitd:FactionStatus ; rdfs:label "Helpful (+1)" ; rdfs:comment "Will help if it causes no problems or significant cost." .
+fitd:Friendly     a owl:NamedIndividual, fitd:FactionStatus ; rdfs:label "Friendly (+2)" ; rdfs:comment "Will help if it doesn't create serious problems." .
+fitd:Allies       a owl:NamedIndividual, fitd:FactionStatus ; rdfs:label "Allies (+3)" ; rdfs:comment "Helps even when not in their best interest." .
+
+# ============================================================
+# 32. CLAIMS
+# ============================================================
+
+fitd:Claim
+    a owl:Class ;
+    rdfs:label "Claim" ;
+    rdfs:comment "Territory or asset on the crew's claim map. Seized from controlling factions via score operations. Provides ongoing benefits while held. Some claims count as turf. Max 6 turf from claims." .
+
+fitd:claimName
+    a owl:DatatypeProperty ;
+    rdfs:label "claim name" ;
+    rdfs:domain fitd:Claim ;
+    rdfs:range xsd:string .
+
+fitd:claimBenefit
+    a owl:DatatypeProperty ;
+    rdfs:label "claim benefit" ;
+    rdfs:domain fitd:Claim ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Ongoing game benefit provided while the claim is held." .
+
+fitd:countsAsTurf
+    a owl:DatatypeProperty ;
+    rdfs:label "counts as turf" ;
+    rdfs:domain fitd:Claim ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True if this claim contributes to turf count for rep reduction." .
+
+fitd:controlledBy
+    a owl:ObjectProperty ;
+    rdfs:label "controlled by" ;
+    rdfs:domain fitd:Claim ;
+    rdfs:range fitd:Faction ;
+    rdfs:comment "The faction currently holding this claim." .
+
+# ============================================================
+# 33. COIN & STASH SYSTEM
+# ============================================================
+
+fitd:Coin
+    a owl:Class ;
+    rdfs:label "Coin" ;
+    rdfs:comment "Abstract currency. Common uses: buy extra downtime activities (1 coin each), improve downtime roll results (1-for-1), avoid entanglements, advance crew Tier, stash for retirement. Values: 1=week wages, 4=month wages, 10=significant asset liquidation." .
+
+fitd:Stash
+    a owl:Class ;
+    rdfs:label "Stash" ;
+    rdfs:comment "Character long-term savings (0-40). Determines retirement outcome and lifestyle quality (1 quality per 10 stash). Removing stash: 2 stash = 1 coin." .
+
+# ============================================================
+# 34. EFFECT FACTORS
+# ============================================================
+
+fitd:EffectFactor
+    a owl:Class ;
+    rdfs:label "Effect Factor" ;
+    rdfs:comment "One of three factors assessed when determining effect level. Each factor may raise or lower the effect level independently." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:Potency fitd:QualityFactor fitd:ScaleFactor )
+    ] .
+
+fitd:Potency
+    a owl:NamedIndividual, fitd:EffectFactor ;
+    rdfs:label "Potency" ;
+    rdfs:comment "Particular weaknesses, extra time/risk taken, or influence of arcane powers. Contextual advantage or disadvantage." .
+
+fitd:QualityFactor
+    a owl:NamedIndividual, fitd:EffectFactor ;
+    rdfs:label "Quality / Tier" ;
+    rdfs:comment "Effectiveness of tools, weapons, or resources, summarised by Tier. Fine items add +1 quality stacking with Tier." .
+
+fitd:ScaleFactor
+    a owl:NamedIndividual, fitd:EffectFactor ;
+    rdfs:label "Scale" ;
+    rdfs:comment "Number of opponents, area covered, scope of influence. More people better in battle; more people worse for infiltration." .
+
+# ============================================================
+# 35. MAGNITUDE
+# ============================================================
+
+fitd:Magnitude
+    a owl:Class ;
+    rdfs:label "Magnitude" ;
+    rdfs:comment "A 0-6 scale measuring the power, area/scale, duration/range, and force of supernatural entities and arcane energies. Used as dice pool for fortune rolls and as guideline for stress cost of rituals and quality level of assets/alchemicals." .
+
+fitd:magnitudeValue
+    a owl:DatatypeProperty ;
+    rdfs:label "magnitude value" ;
+    rdfs:domain fitd:Magnitude ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "0-6 numeric rating." .
+
+fitd:MagnitudeDimension
+    a owl:Class ;
+    rdfs:label "Magnitude Dimension" ;
+    rdfs:comment "The aspect of the entity or power being measured." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:AreaScale fitd:DurationRange fitd:TierQualityForce )
+    ] .
+
+fitd:AreaScale        a owl:NamedIndividual, fitd:MagnitudeDimension ; rdfs:label "Area / Scale" ; rdfs:comment "0: closet/1-2 people … 6: colossal gang (160 people)." .
+fitd:DurationRange    a owl:NamedIndividual, fitd:MagnitudeDimension ; rdfs:label "Duration / Range" ; rdfs:comment "0: moments/within reach … 6: a week/across the city." .
+fitd:TierQualityForce a owl:NamedIndividual, fitd:MagnitudeDimension ; rdfs:label "Tier & Quality / Force" ; rdfs:comment "0: Poor/Weak … 6: Legendary/Devastating." .
+
+fitd:magnitudeDimension
+    a owl:ObjectProperty ;
+    rdfs:label "magnitude dimension" ;
+    rdfs:domain fitd:Magnitude ;
+    rdfs:range fitd:MagnitudeDimension .
+
+# ============================================================
+# 36. CRAFTING
+# ============================================================
+
+fitd:Crafting
+    a owl:Class ;
+    rdfs:label "Crafting" ;
+    rdfs:comment "Downtime activity to create alchemicals, build or modify items, create spark-craft gadgets, or enchant arcane implements. Roll Tinker. Base quality = crew Tier, modified by result. Crit=Tier+2, 6=Tier+1, 4/5=Tier, 1-3=Tier-1. Coin spent 1-for-1 to raise quality." .
+
+fitd:CreationType
+    a owl:Class ;
+    rdfs:label "Creation Type" ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf ( fitd:Mundane fitd:Alchemical fitd:ArcaneCreation fitd:SparkCraft )
+    ] .
+
+fitd:Mundane        a owl:NamedIndividual, fitd:CreationType ; rdfs:label "Mundane" ; rdfs:comment "Standard non-magical item." .
+fitd:Alchemical     a owl:NamedIndividual, fitd:CreationType ; rdfs:label "Alchemical" ; rdfs:comment "Chemical or biological creation. Must have Consumable drawback (usually 1 use). Requires Alchemist ability for bonus." .
+fitd:ArcaneCreation a owl:NamedIndividual, fitd:CreationType ; rdfs:label "Arcane" ; rdfs:comment "Magically enhanced creation. Requires Strange Methods ability for bonus." .
+fitd:SparkCraft     a owl:NamedIndividual, fitd:CreationType ; rdfs:label "Spark-Craft" ; rdfs:comment "Electroplasmic mechanical gadget. Requires Artificer ability for bonus." .
+
+fitd:Drawback
+    a owl:Class ;
+    rdfs:label "Drawback" ;
+    rdfs:comment "A limitation on a crafted creation or modification." ;
+    owl:equivalentClass [
+        a owl:Class ;
+        owl:oneOf (
+            fitd:Complex fitd:Conspicuous fitd:Consumable
+            fitd:Rare fitd:Unreliable fitd:Volatile
+        )
+    ] .
+
+fitd:Complex      a owl:NamedIndividual, fitd:Drawback ; rdfs:label "Complex" ; rdfs:comment "Multi-stage creation; one downtime activity and roll per stage." .
+fitd:Conspicuous  a owl:NamedIndividual, fitd:Drawback ; rdfs:label "Conspicuous" ; rdfs:comment "+1 heat if used any number of times on an operation." .
+fitd:Consumable   a owl:NamedIndividual, fitd:Drawback ; rdfs:label "Consumable" ; rdfs:comment "Limited uses (all alchemicals: usually 1 use)." .
+fitd:Rare         a owl:NamedIndividual, fitd:Drawback ; rdfs:label "Rare" ; rdfs:comment "Requires a rare item or material when crafted." .
+fitd:Unreliable   a owl:NamedIndividual, fitd:Drawback ; rdfs:label "Unreliable" ; rdfs:comment "When used, make a fortune roll with the item's quality to see how well it performs." .
+fitd:Volatile     a owl:NamedIndividual, fitd:Drawback ; rdfs:label "Volatile" ; rdfs:comment "Produces a dangerous side-effect for the user specified by GM. May be resisted." .
+
+fitd:hasDrawback
+    a owl:ObjectProperty ;
+    rdfs:label "has drawback" ;
+    rdfs:domain fitd:Item ;
+    rdfs:range fitd:Drawback .
+
+fitd:creationType
+    a owl:ObjectProperty ;
+    rdfs:label "creation type" ;
+    rdfs:domain fitd:Item ;
+    rdfs:range fitd:CreationType .
+
+fitd:Invention
+    a owl:Class ;
+    rdfs:label "Invention" ;
+    rdfs:comment "A novel formula or design for a new alchemical or item. Requires Study as a long-term project (8-segment clock) to invent. Answers 4 questions: type/function, minimum quality, obscurity reason, drawbacks. Can only be crafted by the inventor or someone who learns the design." .
+
+# ============================================================
+# 37. RITUALS
+# ============================================================
+
+fitd:Ritual
+    a owl:Class ;
+    rdfs:label "Ritual" ;
+    rdfs:comment "An arcane procedure to summon a supernatural effect or being. Requires the Ritual special ability. Learned via long-term project (8-segment clock) from a discovered source. Performance: one downtime activity minimum, stress cost based on magnitude, may require Attune roll if dangerous, fortune roll if uncertain." .
+
+fitd:ritualEffect
+    a owl:DatatypeProperty ;
+    rdfs:label "ritual effect" ;
+    rdfs:domain fitd:Ritual ;
+    rdfs:range xsd:string ;
+    rdfs:comment "What the ritual does and how it is weird." .
+
+fitd:ritualPrice
+    a owl:DatatypeProperty ;
+    rdfs:label "ritual price" ;
+    rdfs:domain fitd:Ritual ;
+    rdfs:range xsd:string ;
+    rdfs:comment "What must be done to perform it and its cost (stress, materials, clock, sacrifice)." .
+
+fitd:ritualBelief
+    a owl:DatatypeProperty ;
+    rdfs:label "ritual belief or fear" ;
+    rdfs:domain fitd:Ritual ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The new belief or fear instilled by knowledge of this ritual." .
+
+fitd:ritualStressCost
+    a owl:DatatypeProperty ;
+    rdfs:label "ritual stress cost" ;
+    rdfs:domain fitd:Ritual ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Minimum stress suffered when performing the ritual, per its magnitude. May be reduced by taking more time (duration magnitude)." .
+
+fitd:ritualMagnitude
+    a owl:ObjectProperty ;
+    rdfs:label "ritual magnitude" ;
+    rdfs:domain fitd:Ritual ;
+    rdfs:range fitd:Magnitude ;
+    rdfs:comment "The magnitude of the arcane forces brought to bear. Used as guideline for stress cost." .
+
+# ============================================================
+# 38. OBJECT PROPERTY — crew membership and participation
+# ============================================================
+
+fitd:participatesIn
+    a owl:ObjectProperty ;
+    rdfs:label "participates in" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:Score ;
+    rdfs:comment "Links a character to the scores they participate in." .
+
+fitd:crewOf
+    a owl:ObjectProperty ;
+    rdfs:label "crew of" ;
+    rdfs:domain fitd:Character ;
+    rdfs:range fitd:Crew ;
+    rdfs:comment "The crew this character belongs to." .
+
+fitd:controllingFaction
+    a owl:ObjectProperty ;
+    rdfs:label "controlling faction" ;
+    rdfs:domain fitd:Crew ;
+    rdfs:range fitd:Faction ;
+    rdfs:comment "A faction that exerts control or tribute obligations over the crew's territory." .
+
+fitd:targetFaction
+    a owl:ObjectProperty ;
+    rdfs:label "target faction" ;
+    rdfs:domain fitd:Score ;
+    rdfs:range fitd:Faction ;
+    rdfs:comment "The faction or entity the score is directed against." .
+
+fitd:hasEngagementRoll
+    a owl:ObjectProperty ;
+    rdfs:label "has engagement roll" ;
+    rdfs:domain fitd:Score ;
+    rdfs:range fitd:EngagementRoll .
+
+fitd:generatesPayoff
+    a owl:ObjectProperty ;
+    rdfs:label "generates payoff" ;
+    rdfs:domain fitd:Score ;
+    rdfs:range fitd:Payoff .
+
+fitd:generatesHeat
+    a owl:ObjectProperty ;
+    rdfs:label "generates heat" ;
+    rdfs:domain fitd:Score ;
+    rdfs:range fitd:Heat .
+
+fitd:triggersEntanglement
+    a owl:ObjectProperty ;
+    rdfs:label "triggers entanglement" ;
+    rdfs:domain fitd:DowntimePhase ;
+    rdfs:range fitd:Entanglement .
+
+fitd:DowntimePhase
+    a owl:Class ;
+    rdfs:label "Downtime Phase Instance" ;
+    rdfs:comment "A concrete instance of the downtime phase following a particular score." .
+
+fitd:followsScore
+    a owl:ObjectProperty ;
+    rdfs:label "follows score" ;
+    rdfs:domain fitd:DowntimePhase ;
+    rdfs:range fitd:Score .
+
+
+
+# ============================================================
+# FITD — LLMArtifact annotations
+# Patch file: import alongside fitd.ttl
+# Covers: Character, Crew, Faction, Score, Roll, ActionRoll,
+#         ProgressClock, Harm, Consequence, Flashback,
+#         DowntimeActivity, Vice, Playbook, Cohort, Ritual,
+#         FactionRelationship
+# Artifact types: Descriptor, SystemPrompt, StyleGuide
+# Language: en
+# ============================================================
+
+# ── LLMArtifactType individuals (reused across all artifacts) ──────────────
+
+fitd:_artifactTypeDescriptor
+    a rpg:LLMArtifactType ;
+    schema:name "Descriptor" ;
+    rdfs:comment "Explains what an element is, when to use it, and what constraints matter for LLM reasoning." .
+
+fitd:_artifactTypeSystemPrompt
+    a rpg:LLMArtifactType ;
+    schema:name "SystemPrompt" ;
+    rdfs:comment "Full system-prompt text for an Actor node, to be injected into an LLM context." .
+
+fitd:_artifactTypeStyleGuide
+    a rpg:LLMArtifactType ;
+    schema:name "StyleGuide" ;
+    rdfs:comment "Tonal and narrative style guidance for GM/LLM narration of this element." .
+
+# ================================================================
+# 1. CHARACTER
+# ================================================================
+
+fitd:Character
+    rpg:llmDescriptor """A player character (PC) in a Forged in the Dark game.
+Key state: playbook, 12 action ratings (0-4), stress (0-9), trauma conditions, harm levels (1-4), vice, load, coin, stash.
+When reasoning about a Character: always check current stress before suggesting risky actions; trauma conditions actively colour narration; harm at level 2+ imposes -1d penalties; level 3 means incapacitated. Stash (0-40) determines retirement quality.""" ;
+
+    rpg:llmSystemPrompt """You are a Forged in the Dark player character.
+Speak and act in the first person, consistent with your playbook, vice, trauma conditions, and current harm.
+If you have stress >= 7, show visible strain. If you carry a trauma condition (Cold, Haunted, Obsessed, Paranoid, Reckless, Soft, Unstable, Vicious), let it subtly colour your words and choices.
+Never contradict established fiction. When asked to act, state your intended goal and chosen action, not a guaranteed outcome.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Character ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Character — LLM Descriptor
+
+**Role in game:** The primary unit of player agency. One Character per player, defined by a Playbook.
+
+**State to track:**
+| Field | Range | LLM relevance |
+|---|---|---|
+| currentStress | 0–9 | ≥9 → trauma tick; suggest resistance/flashback trade-offs |
+| traumaCount | 0–4 | 4 → retirement/imprisonment forced |
+| harmLevel (per slot) | 1–4 | 2 = -1d on relevant rolls; 3 = incapacitated; 4 = fatal |
+| coin | int | spendable per scene; stash is long-term |
+| stash | 0–40 | retirement outcome at 40 |
+
+**Narration rules:**
+- Trauma conditions (Cold, Haunted, Obsessed, Paranoid, Reckless, Soft, Unstable, Vicious) are always active personality filters.
+- Harm descriptions are narrative facts, not just numbers—reference them in scene description.
+- Vice is the *only* official stress relief; failure to indulge costs stress equal to trauma count.
+
+**Common LLM tasks:** generate NPC reactions to PC, narrate consequence of harm, suggest appropriate action for goal, voice PC in dialogue."""
+    ] ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeStyleGuide ;
+        rpg:artifactAppliesTo fitd:Character ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Character — Style Guide
+
+Tone: gritty, morally complex, pragmatic. Characters are competent criminals under pressure—not heroes.
+
+- Use concrete sensory detail when describing harm or stress relief.
+- Trauma conditions manifest as behavioural tics, not monologues. *Cold* = flat affect, clipped sentences. *Haunted* = distracted gaze, muttered names. *Reckless* = dismissive of danger, impatient.
+- Avoid melodrama; favour understatement. "I've had worse" over "I writhe in agony."
+- When a character pushes themselves (2 stress for +1d), show the physical or mental cost in the narration.
+- Stash and coin are power and freedom—characters notice when they're flush or broke."""
+    ] .
+
+# ================================================================
+# 2. CREW
+# ================================================================
+
+fitd:Crew
+    rpg:llmDescriptor """The collective Actor node for the player group. Tracks Tier (0-6), hold (Weak/Strong), rep (0-12-turf), heat (0-9), wanted level (0-4), crew coin, lair, hunting grounds, claims, cohorts, and upgrades.
+Key LLM rules: Tier governs quality of all assets and gang scale. Rep fills at 12-turf to develop (strengthen hold or pay to raise Tier). Heat reaching 9 triggers wanted level +1 and resets heat. War status halves downtime actions.""" ;
+
+    rpg:llmSystemPrompt """You are narrating the collective state and reputation of a Forged in the Dark crew.
+Reference their Tier when assessing whether they can plausibly acquire assets or face opposition.
+Reference heat and wanted level when describing how law enforcement and rivals perceive them.
+Reference hold when assessing crew stability. Weak hold means rivals sense vulnerability.
+Never invent claims or upgrades not in the crew sheet.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Crew ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Crew — LLM Descriptor
+
+**Role:** Collective Actor. The crew's sheet is as important as individual characters.
+
+**Critical state fields:**
+| Field | Effect |
+|---|---|
+| tier | Base quality for all crew assets; gang scale; cost to raise Tier = new Tier × 8 coin |
+| hold | Weak → rivals can challenge; losing at Tier 0 weak = lair lost |
+| rep | Fills tracker (12 − turf) to develop |
+| crewHeat | 0-9; at 9: +1 wanted level, clear heat |
+| crewWantedLevel | 0-4; 4 = life sentence / execution |
+| crewCoin | Max 4 (8 with vault, 16 with second vault) |
+
+**Claim map:** Claims in adjacent map nodes can be seized via score; each claim has a concrete ongoing benefit. Turf claims (countsAsTurf=true) reduce rep needed to develop.
+
+**War status effect on downtime:** Only 1 downtime activity per PC instead of 2.
+
+**Common LLM tasks:** assess whether crew can afford an action, determine NPC faction reactions by tier differential, narrate lair description, generate entanglement based on heat + wanted level."""
+    ] ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeStyleGuide ;
+        rpg:artifactAppliesTo fitd:Crew ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Crew — Style Guide
+
+The crew is an organism with its own reputation, culture, and pressure.
+
+- Describe the lair as a living space that reflects the crew's current state: Tier 0 lair is cramped and improvised; Tier III lair has earned comforts and defensible space.
+- Heat should feel like a tightening noose: more patrols, side glances in markets, informants getting nervous.
+- Rep is social capital—NPCs treat the crew differently at Tier I vs Tier III. Show this in reactions, not just numbers.
+- Wanted level changes the city's ambient texture: wanted 0 = anonymous; wanted 3 = faces on wanted posters, ambushes possible."""
+    ] .
+
+# ================================================================
+# 3. FACTION
+# ================================================================
+
+fitd:Faction
+    rpg:llmDescriptor """An NPC organization with Tier (0-VI), hold, faction clocks (long-term goals), and status relationships to the crew and other factions. Factions act autonomously between sessions (GM ticks faction clocks during downtime). Status relationships range from War (-3) to Allies (+3). Tier differential determines how dangerous a faction is relative to the crew.""" ;
+
+    rpg:llmSystemPrompt """You are voicing or reasoning about a Forged in the Dark faction.
+A faction acts in its own interest, guided by its tier, hold, and active faction clocks.
+When the crew interacts with a faction: consult the current status value (-3 to +3). Negative status = faction looks for opportunities to harm or hinder. Positive status = faction helps within its comfort zone.
+Status changes by +1 or -1 per significant interaction. War (-3) triggers specific mechanical penalties for the crew.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Faction ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Faction — LLM Descriptor
+
+**Role:** Autonomous NPC organization. The faction game runs in the background—factions pursue their own goals via faction clocks ticked during downtime.
+
+**Key fields:**
+- `factionTier` (0-VI): Power scale. A Tier IV faction can effortlessly crush a Tier I crew unless the crew is clever.
+- `factionHold` (Weak/Strong): Weak-hold factions are vulnerable and may lose claims or tier.
+- Faction clocks: progress toward long-term goals (conquest, ritual completion, political coup). Filled clocks trigger world changes.
+
+**Status ladder interaction:**
+| Value | Label | Faction behaviour |
+|---|---|---|
+| -3 | War | Actively attacks crew; crew gets +1 heat per score, -1 hold, 1 downtime action |
+| -2 | Hostile | Attacks when convenient |
+| -1 | Interfering | Opportunistic obstruction |
+| 0 | Neutral | Ignores unless provoked |
+| +1 | Helpful | Assists if cost is low |
+| +2 | Friendly | Assists unless serious risk |
+| +3 | Allies | Assists even at personal cost |
+
+**Common LLM tasks:** generate faction NPC dialogue consistent with status, narrate faction clock consequence, determine faction reaction to crew score."""
+    ] ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeStyleGuide ;
+        rpg:artifactAppliesTo fitd:Faction ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Faction — Style Guide
+
+Factions are institutions, not individuals. Voice them through their representatives.
+
+- Hostile factions: representatives are cold, transactional, or openly contemptuous—never cartoonishly evil.
+- Allied factions: warmth is conditional and professional, not sentimental.
+- Faction goals feel inevitable—their clocks tick whether or not the crew pays attention.
+- Higher-tier factions speak with the calm confidence of those who rarely face real opposition. Lower-tier factions are scrappier, more reactive."""
+    ] .
+
+# ================================================================
+# 4. SCORE
+# ================================================================
+
+fitd:Score
+    rpg:llmDescriptor """A single operation (criminal activity, claim seizure, or special mission). Lifecycle: choose plan + detail → engagement roll → score phase (action rolls, flashbacks, teamwork) → outcome → downtime (payoff, heat, entanglement). The engagement roll sets initial position (1-3=Desperate, 4-5=Risky, 6=Controlled, Crit=first obstacle cleared). Payoff: base 2 rep ± Tier differential; coin by scale (2-10+). Heat added by operation type (0/2/4/6) plus modifiers.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Score ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Score — LLM Descriptor
+
+**Role:** The primary unit of dramatic play. A score is a heist, assassination, smuggling run, or any dangerous operation.
+
+**Lifecycle for LLM reasoning:**
+1. **Plan selection** (6 types: Assault, Deception, Stealth, Occult, Social, Transport) + required detail.
+2. **Engagement roll** (fortune roll, starts at 1d): sets opening position.
+3. **Score phase**: PCs make action rolls. Flashbacks, teamwork, clocks all active.
+4. **Outcome**: Success / Failure / Abandoned.
+5. **Downtime sequence**: Payoff → Heat accrual → Entanglement roll → Downtime activities.
+
+**Heat formula:** base (0 quiet / 2 normal / 4 exposing / 6 wild) + modifiers:
+- +1 high-profile target
+- +1 hostile turf
+- +1 crew at war
+- +2 killing involved
+
+**Payoff rep:** base 2, +1 per tier target exceeds crew, -1 per tier below (min 0). Zero if completely quiet.
+
+**Common LLM tasks:** narrate engagement roll outcome as fictional opening scene, generate entanglement from heat + wanted level table, calculate payoff from score parameters."""
+    ] ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeStyleGuide ;
+        rpg:artifactAppliesTo fitd:Score ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Score — Style Guide
+
+A score is a pressure cooker. Narrate it in present tense, close third person or second person.
+
+- The engagement roll narration should drop the crew into the middle of the action—skip approach montages.
+- Controlled opening: crew has a moment of calm advantage; show it before the complications arrive.
+- Risky opening: something is already wrong, or is about to be; tension is immediate.
+- Desperate opening: the crew is already in deep trouble; survival is the first question.
+- As the score progresses, track fiction carefully—consequences should feel earned, not arbitrary."""
+    ] .
+
+# ================================================================
+# 5. ROLL (abstract) + ActionRoll
+# ================================================================
+
+fitd:Roll
+    rpg:llmDescriptor """Abstract roll class. All FITD rolls: assemble a pool of d6s from a trait rating; read the single highest die. Pool ≤ 0: roll 2d, take lowest, no critical possible. Results: 1-3 Bad Outcome, 4-5 Partial Success, 6 Full Success, two+ 6s = Critical. Subtypes: ActionRoll, FortuneRoll, ResistanceRoll, DowntimeRoll (and EngagementRoll, ViceRoll as further subtypes).""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Roll ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Roll — LLM Descriptor
+
+**Core mechanic shared by all roll types:**
+- Pool = trait rating in d6s. Rating 0 or negative → roll 2d, take lowest.
+- Bonus dice sources (max +2 total): Assist (+1d, costs teammate 1 stress), Push Yourself (+1d, costs 2 stress), Devil's Bargain (+1d, complication regardless of outcome).
+- Read only the **single highest die**:
+  - 1-3 → Bad Outcome
+  - 4-5 → Partial Success
+  - 6 → Full Success
+  - Two or more 6s → Critical (exceptional outcome, +bonus effect)
+- No critical is possible when rolling 2d-take-lowest.
+
+**Subtype selection guide for LLM:**
+| Situation | Roll subtype |
+|---|---|
+| PC attempts something dangerous | ActionRoll |
+| GM leaves outcome to chance | FortuneRoll |
+| PC resists a consequence | ResistanceRoll |
+| PC performs a downtime activity | DowntimeRoll |
+| Crew starts a score | EngagementRoll (subtype of Fortune) |
+| PC indulges vice | ViceRoll (subtype of Downtime) |"""
+    ] .
+
+fitd:ActionRoll
+    rpg:llmDescriptor """The most common roll. Requires: stated goal, chosen action (one of 12), GM-set position (Controlled/Risky/Desperate), GM-set effect level (Limited/Standard/Great). Pool = character's action rating. Desperate rolls grant 1 XP in the relevant attribute track. On 4-5 (partial): achieve goal but suffer a consequence at the current position's severity. On 1-3 (bad): usually fail goal and suffer worse consequence.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:ActionRoll ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:ActionRoll — LLM Descriptor
+
+**Pre-roll checklist (LLM must address all four before narrating):**
+1. **Goal** — what concrete fictional outcome does the PC want?
+2. **Action** — which of the 12 actions applies? (Hunt/Study/Survey/Tinker/Finesse/Prowl/Skirmish/Wreck/Attune/Command/Consort/Sway)
+3. **Position** — Controlled / Risky / Desperate (GM-set; player may trade effect for position)
+4. **Effect level** — Zero / Limited / Standard / Great (based on potency, quality/tier, scale)
+
+**Consequence severity by position:**
+- Controlled: lesser harm, -1 effect, or minor complication
+- Risky: moderate harm, worse position, or meaningful complication
+- Desperate: severe harm, lost opportunity, or serious complication
+
+**XP trigger:** Desperate action roll → mark 1 XP in the attribute used (Insight/Prowess/Resolve).
+
+**LLM output format:** Narrate (1) what the character attempts, (2) what happens on each result tier, (3) what consequence applies if relevant, (4) whether armor or resistance applies."""
+    ] .
+
+# ================================================================
+# 6. PROGRESS CLOCK
+# ================================================================
+
+fitd:ProgressClock
+    rpg:llmDescriptor """A circle divided into segments (typically 4, 6, or 8) representing ongoing fictional pressure, danger, or effort. Named after the obstacle or threat, not the method. Eight types: Danger, Racing, Linked, Mission, TugOfWar, LongTermProject, Faction, Healing. Filled by ticks from action roll effect levels (Great=3, Standard=2, Limited=1). A full clock triggers its fictional consequence. Linked clocks unlock the next clock when filled.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:ProgressClock ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:ProgressClock — LLM Descriptor
+
+**Purpose:** Clocks make fictional pressure visible and trackable. They are *not* secret—players can usually see them.
+
+**Segment guidelines:**
+- 4 segments: a single complex obstacle
+- 6 segments: a layered challenge
+- 8 segments: a major long-term threat or project
+
+**Ticking rules:**
+- Great Effect → +3 segments
+- Standard Effect → +2 segments
+- Limited Effect → +1 segment
+- Complication consequence → GM ticks danger/faction clocks directly
+
+**Clock types and their LLM use:**
+| Type | Use case | Fills when... |
+|---|---|---|
+| Danger | Patrol alert, suspicion | Complication consequences occur |
+| Racing | Two competing efforts | Either side's clock fills first |
+| Linked | Multi-stage challenge | Previous clock fills, unlocking this one |
+| Mission | Time-sensitive window | Time passes without completion = mission failed |
+| TugOfWar | Back-and-forth conflict | One side reaches full |
+| LongTermProject | Multi-downtime effort | Player spends downtime activity rolls |
+| Faction | NPC faction goal | GM ticks during downtime |
+| Healing | Character recovery | Recover downtime activity rolls |
+
+**LLM narration tip:** Describe clocks by their fictional name ("The Watch's Alert Clock is at 5/6—one more stumble and they'll lock down the district"), never by raw segment counts in player-facing narration.""" ;
+        rpg:artifactScope fitd:ProgressClock
+    ] ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeStyleGuide ;
+        rpg:artifactAppliesTo fitd:ProgressClock ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:ProgressClock — Style Guide
+
+Clocks are dread made visible. Narrate their advance with escalating texture.
+
+- Segment 1-2: subtle hints, background noise, easy to ignore.
+- Segment 3-4: undeniable signs, NPCs react, options start narrowing.
+- Segment 5-6: crisis imminent, tension peaks, players feel the walls closing.
+- Full clock: consequence lands hard—narrate it as a scene change, not a footnote."""
+    ] .
+
+# ================================================================
+# 7. HARM
+# ================================================================
+
+fitd:Harm
+    rpg:llmDescriptor """A lasting debility recorded on a character's harm tracker. Four levels: 1 (Lesser—Reduced Effect), 2 (Moderate—-1d on relevant rolls), 3 (Severe—incapacitated/need help), 4 (Fatal—death unless resisted). Harm slots: two at L1, two at L2, one at L3. If a level is full, harm escalates to next level. All harm cleared when healing clock fills. Harm is named narratively (e.g., 'Gut Stabbed', 'Shattered Leg').""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Harm ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Harm — LLM Descriptor
+
+**Harm track layout per character:**
+```
+Level 1 (Lesser):   [slot 1] [slot 2]  → Penalty: Reduced Effect
+Level 2 (Moderate): [slot 1] [slot 2]  → Penalty: -1d on relevant rolls
+Level 3 (Severe):   [slot 1]           → Penalty: Incapacitated / Need Help
+Level 4 (Fatal):    immediate death (unless resisted)
+```
+
+**Escalation rule:** If the relevant level row is full, harm goes to the next level up.
+
+**Mechanical penalties (LLM must apply):**
+- Level 1: Any roll directly impeded by the harm uses one less effect level.
+- Level 2: -1d on action rolls directly impeded by the harm.
+- Level 3: Cannot act without assistance; incapacitated for affected activity.
+- Level 4: Dead unless a resistance roll reduces it to level 3.
+
+**Healing:** Recover downtime activity ticks a healing clock (4 segments). Filling the clock reduces *all* harm by one level. Armor/special abilities can block harm entirely.
+
+**Narration rule:** Always give harm a specific narrative name. "Hurt" is not a harm—"Broken Rib from Guard's Boot" is."""
+    ] .
+
+# ================================================================
+# 8. CONSEQUENCE
+# ================================================================
+
+fitd:Consequence
+    rpg:llmDescriptor """A negative outcome from a partial (4-5) or bad (1-3) action roll, or from enemy action. Five types: ReducedEffect (action's effect drops one level), Complication (danger/faction clock ticks 1/2/3), LostOpportunity (window closed, new approach needed), WorsePosition (position degrades for follow-up), HarmConsequence (harm recorded at appropriate level). Can be resisted with a resistance roll (costs stress) or negated with armor.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Consequence ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Consequence — LLM Descriptor
+
+**The five consequence types and when to use each:**
+
+| Type | When to use | Severity scale |
+|---|---|---|
+| ReducedEffect | Action partially works but less powerfully | Effect level drops by 1 |
+| Complication | New problem / mounting danger | Minor=1 clock tick; Standard=2; Serious=3 |
+| LostOpportunity | The moment has passed; approach must change | Absolute—no roll to recover this window |
+| WorsePosition | Setup for a nastier follow-up | Controlled→Risky, Risky→Desperate |
+| HarmConsequence | Physical/mental injury | Level set by position (Controlled=L1, Risky=L2, Desperate=L3) |
+
+**Resistance:** Player may always offer to resist. GM confirms it applies and which attribute resists (Insight=deception/understanding, Prowess=physical, Resolve=mental). Cost: 6 − highest die in stress. Critical on resistance = clear 1 stress instead.
+
+**Armor negation:** Marking an armor box (Standard, Heavy, or Special) can reduce or negate a consequence entirely—no roll needed.
+
+**LLM decision rule:** Match consequence type to the *fiction*, not just the mechanic. A guard noticing the crew is a Complication (alert clock tick), not Harm. A trap springing is Harm, not just WorsePosition."""
+    ] .
+
+# ================================================================
+# 9. FLASHBACK
+# ================================================================
+
+fitd:Flashback
+    rpg:llmDescriptor """A mid-score technique: a player invokes an action taken in the fictional past that affects the current situation. Costs 0-2+ stress (GM-set). May require an action/fortune roll, or just the stress payment. Cannot undo established present-moment fiction. Downtime activities in flashback cost 1 coin or 1 rep instead of stress. The GM must determine if the flashback contradicts established facts before allowing it.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Flashback ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Flashback — LLM Descriptor
+
+**Purpose:** Flashbacks let players retroactively establish preparations without front-loading planning. They reward creative play mid-score.
+
+**LLM adjudication checklist:**
+1. **Does it contradict established fiction?** If yes, it cannot be allowed. ("We already saw you enter through the front door without any disguise.")
+2. **How plausible/elaborate is it?** Set stress cost:
+   - 0 stress: ordinary action, easy opportunity ("I scouted this route last week")
+   - 1 stress: complex action or unlikely opportunity ("I bribed the guard last month")
+   - 2+ stress: elaborate contingency with special equipment or preparation
+3. **Does it require a roll?** Simple plausible actions: no roll, just stress cost. Uncertain outcomes: action or fortune roll.
+4. **Is it a downtime activity?** If so, cost is 1 coin or 1 rep (not stress).
+
+**Style guidance:** Narrate flashbacks in past tense, brief and cinematic. Cut back to the present as soon as the relevant detail is established.""" ;
+        rpg:artifactScope fitd:Flashback
+    ] .
+
+# ================================================================
+# 10. DOWNTIME ACTIVITY
+# ================================================================
+
+fitd:DowntimeActivity
+    rpg:llmDescriptor """Structured action during downtime. Each PC has 2 free activities per downtime (1 if at war). Additional activities cost 1 coin or 1 rep each. Six types: AcquireAsset (roll Tier for temporary resource), LongTermProject (tick project clock), Recover (tick healing clock), ReduceHeat (reduce crew heat), Train (mark 1 XP), IndulgeVice (clear stress via vice roll). Coin may be spent 1-for-1 to raise a downtime roll's result level.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:DowntimeActivity ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:DowntimeActivity — LLM Descriptor
+
+**Available activities and their mechanics:**
+
+| Activity | Roll | Outcome scale (Crit/6/4-5/1-3) |
+|---|---|---|
+| AcquireAsset | Crew Tier | Tier+2 / Tier+1 / Tier / Tier-1 quality asset |
+| LongTermProject | Relevant action | 5 / 3 / 2 / 1 clock ticks |
+| Recover | Healer quality or Tinker | 5 / 3 / 2 / 1 healing clock ticks |
+| ReduceHeat | Relevant action | 5 / 3 / 2 / 1 heat reduced |
+| Train | — (no roll) | Mark 1 XP in chosen track (+1 if crew training upgrade applies) |
+| IndulgeVice | Lowest attribute rating | Clear stress = highest die; overindulge if > stress marked |
+
+**Coin to raise result:** Spend 1 coin after rolling to move result up one tier (e.g., 4-5 → 6). No limit except available coin.
+
+**At war restriction:** Only 1 downtime activity per PC (not 2).
+
+**LLM narration tip:** Downtime should feel like breathing room after the score's tension. Narrate activities briefly but with character flavour—who does the character visit? What does their vice look like in practice?"""
+    ] .
+
+# ================================================================
+# 11. VICE
+# ================================================================
+
+fitd:Vice
+    rpg:llmDescriptor """A character's obsession, indulged during downtime via the IndulgeVice activity to clear stress. Types: Faith, Gambling, Luxury, Obligation, Pleasure, Stupor, Weird. Each vice has a named purveyor (NPC or location). Vice roll: pool = lowest attribute rating; clear stress equal to highest die. Overindulge (clear more than marked): pick a consequence (AttractTrouble, Brag, Lost, Tapped). Not indulging costs stress equal to trauma count.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Vice ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Vice — LLM Descriptor
+
+**Mechanical role:** The only official stress relief valve. Vice is not optional flavour—it's a survival mechanism.
+
+**Vice types and their narrative texture:**
+| Vice | Flavour |
+|---|---|
+| Faith | Ritual, prayer, devotion to a deity or cause |
+| Gambling | Cards, dice, risky bets, the rush of chance |
+| Luxury | Fine food, clothes, comfort, extravagance |
+| Obligation | Family, debt, a person the character can't say no to |
+| Pleasure | Physical indulgence: drink, drugs, intimacy |
+| Stupor | Numbing: heavy drink, oblivion-seeking substances |
+| Weird | Arcane dabbling, dangerous experiments, forbidden knowledge |
+
+**Overindulgence consequences:**
+- AttractTrouble: roll an additional entanglement
+- Brag: +2 heat
+- Lost: character vanishes for weeks, returns with all harm healed
+- Tapped: current purveyor cuts the character off; must find a new source
+
+**Failure to indulge:** Stress cost = current trauma count (0 if no trauma). This can cascade into another trauma if stress hits 9.
+
+**LLM task:** When a character indulges, narrate a brief scene at the purveyor. Make the vice feel real and specific, not generic.""" ;
+        rpg:artifactScope fitd:Vice
+    ] ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeStyleGuide ;
+        rpg:artifactAppliesTo fitd:Vice ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Vice — Style Guide
+
+Vice scenes are intimate, specific, and briefly rendered.
+
+- Show the purveyor as a named, real person or place with their own personality.
+- The indulgence itself is shown obliquely—suggest rather than describe in detail.
+- Overindulgence should feel like loss of control: the character meant to stop and didn't.
+- Lost consequence is a time-skip: the character resurfaces somewhere unexpected, not quite sure how they got there, but oddly at peace and fully healed."""
+    ] .
+
+# ================================================================
+# 12. PLAYBOOK
+# ================================================================
+
+fitd:Playbook
+    rpg:llmDescriptor """A character template defining: starting action dots, available special abilities (chosen at creation and via advances), XP triggers, contact list, standard items, and vice options. Not a rigid class—it represents focus and preferred method, not immutable identity. Advancement: when playbook XP track fills, take a new special ability. Special abilities break or bend normal rules and define the playbook's mechanical identity.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Playbook ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Playbook — LLM Descriptor
+
+**Role:** Character archetype template. Defines the mechanical and narrative palette available to a character.
+
+**What a Playbook defines:**
+- Starting action dot distribution (6 dots placed across the 12 actions)
+- Special abilities pool (usually 8-10 options; player picks 1 at start, gains more via advances)
+- Playbook XP trigger (specific to the archetype—e.g., "Express your beliefs, drives, heritage, or background")
+- Contact list (6 named NPCs the character has a relationship with)
+- Suggested items and load-out
+- Starting vice options
+
+**LLM constraints:**
+- A character can only take special abilities from their playbook (unless a special ability grants cross-playbook access).
+- Playbook does not lock roleplay: a Cutter can be thoughtful and diplomatic; a Whisper can be violent.
+- Advancing: when playbook XP track fills → take 1 new special ability from the playbook list.
+- Alternatively: take 2 attribute XP (advance an attribute track instead).
+
+**Common LLM task:** Given a character's playbook, suggest which special ability would best complement their current action ratings and playstyle."""
+    ] .
+
+# ================================================================
+# 13. COHORT
+# ================================================================
+
+fitd:Cohort
+    rpg:llmDescriptor """A gang (group of NPCs) or expert (single skilled NPC) working for the crew. Acquired as a crew upgrade. Quality = crew Tier. Rolls its quality rating for actions. Suffers harm in 4 levels like characters. Breaks at level 3 unless crew abilities prevent it. Has a flaw (problem that triggers gang trouble entanglements) and an edge (specialty area granting +1 effect). Scale varies by type and tier.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Cohort ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Cohort — LLM Descriptor
+
+**Types:**
+- **Gang**: A group of NPCs. Quality = crew Tier. Scale increases with Tier (Tier 0: 1-2 people; Tier III: ~20 people).
+- **Expert**: A single highly-skilled NPC. Quality = crew Tier.
+
+**Action resolution:** Roll cohort quality rating. Same d6 pool, same result tiers.
+
+**Edge vs Flaw:**
+- Edge: A specialty where the cohort performs exceptionally (+1 effect). Example: "Assassins edge: ambushes".
+- Flaw: A weakness that triggers complications. Flaws activate gang trouble entanglements in downtime.
+
+**Harm track:** Same 4-level structure as characters. Level 3 = cohort breaks and cannot act until recovered. Recovery is a crew downtime activity.
+
+**Scale and engagement:** Cohorts affect the Scale factor of effect assessment. A gang with 20 members has meaningful scale advantage over 1-2 targets; scale disadvantage vs 40+ enemies.
+
+**LLM task:** When a cohort acts, narrate their collective action briefly—focus on the effect, not individual member actions."""
+    ] .
+
+# ================================================================
+# 14. RITUAL
+# ================================================================
+
+fitd:Ritual
+    rpg:llmDescriptor """An arcane procedure summoning a supernatural effect or entity. Requires the Ritual special ability. Learned via an 8-segment long-term project from a discovered source. Performance: minimum one downtime activity, stress cost based on magnitude (reduced by extending duration), may require Attune action roll if dangerous, fortune roll if outcome uncertain. Each ritual has: effect, price, belief/fear instilled. Magnitude (0-6) governs stress cost and power scale.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:Ritual ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Ritual — LLM Descriptor
+
+**Prerequisites:**
+1. Character must have the **Ritual** special ability (or equivalent).
+2. Ritual must have been learned via an 8-segment LTP clock from a source (tome, spirit, teacher).
+
+**Design questions (define before play):**
+1. What does it do and how is it weird?
+2. What is the minimum quality required?
+3. Why is this ritual obscure or dangerous?
+4. What are its drawbacks?
+
+**Performance:**
+- Minimum 1 downtime activity to perform.
+- Stress cost = magnitude value (can be reduced by extending duration magnitude).
+- If dangerous: Attune action roll required.
+- If uncertain outcome: Fortune roll.
+
+**Magnitude reference (fitd:Magnitude, 0-6):**
+| Magnitude | Area/Scale | Duration | Tier/Force |
+|---|---|---|---|
+| 0 | Closet / 1-2 people | Moments | Poor/Weak |
+| 2 | A room / small group | An hour | Adequate |
+| 4 | A city block / dozens | A day | Powerful |
+| 6 | City-wide / hundreds | A week | Devastating |
+
+**LLM narration:** Rituals should feel transgressive and costly. The belief/fear instilled is a permanent character mark—reference it in subsequent scenes.""" ;
+        rpg:artifactScope fitd:Ritual
+    ] ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeStyleGuide ;
+        rpg:artifactAppliesTo fitd:Ritual ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:Ritual — Style Guide
+
+Rituals are transgressive acts at the edge of what the world permits.
+
+- Describe the preparation with sensory weight: the smell of the components, the quality of silence as the ritual begins.
+- The effect arrives with wrongness—something real and present but operating outside natural law.
+- The price is never trivial: show the character paying it, not just noting it.
+- The instilled belief/fear should manifest subtly in the character's behaviour afterward—a new nervous habit, an aversion, an obsession."""
+    ] .
+
+# ================================================================
+# 15. FACTION RELATIONSHIP
+# ================================================================
+
+fitd:FactionRelationship
+    rpg:llmDescriptor """A ternary relationship between two factions (or a faction and the crew) with a statusValue integer from -3 (War) to +3 (Allies). Status changes by ±1 per significant interaction. War (-3) is a mechanical state: +1 heat per score, -1 hold, 1 downtime action per PC. The relationship is directional: fromFaction's stance toward toFaction.""" ;
+
+    rpg:hasLLMArtifact [
+        a rpg:LLMArtifact ;
+        rpg:artifactType fitd:_artifactTypeDescriptor ;
+        rpg:artifactAppliesTo fitd:FactionRelationship ;
+        rpg:artifactFormat "markdown" ;
+        rpg:artifactLanguage "en" ;
+        rpg:artifactText """## fitd:FactionRelationship — LLM Descriptor
+
+**Model:** Directional edge with a signed integer.
+- `fromFaction` → `toFaction` with `statusValue` ∈ {-3, -2, -1, 0, +1, +2, +3}
+- Relationships are not necessarily symmetric: Faction A may be Hostile to the crew while the crew is Neutral toward Faction A.
+
+**Status change triggers:**
+- Crew scores against a faction: typically -1 to -2 status (or more if violent/public)
+- Crew assists a faction's goal: +1 status
+- Crew makes a deal and keeps it: +1 status
+- Crew betrays or humiliates: -2 status
+- Status cannot change more than 2 steps in one interaction as a rule of thumb
+
+**War state mechanics (statusValue = -3):**
+- +1 heat on every crew score (not just scores against that faction)
+- Crew loses -1 hold
+- Each PC gets only 1 downtime activity (not 2)
+- Peace: requires significant concession or payment to shift status to -2
+
+**LLM reasoning:** When the crew plans a score targeting a faction, calculate expected status change and narrate the faction's likely response. Status affects NPC dialogue tone, willingness to negotiate, and ambient threat level."""
+    ] .
+
