@@ -1,7 +1,7 @@
 [project]
-name = "ontorag-mcp"
+name = "ontorag-catalog"
 version = "0.1.0"
-description = "OntoRAG MCP Server for Ontologies"
+description = "OntoRAG baseline ontology catalog, served as REST and MCP"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [

@@ -613,7 +613,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ontorag-mcp"
+name = "ontorag-catalog"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
