@@ -1,11 +1,11 @@
 {
   "ontologies": [
-    {"slug": "rpg", "label": "Rpg-schema", "namespace": "rpg", "description":"Ontology for TTRPGs", "path":"rpg.ttl", "tags":[] },
-    {"slug": "foaf", "label": "Rpg-schema", "namespace": "foaf", "description":"Friend of a Friendd", "path":"foaf.ttl", "tags":[] },
-    {"slug": "dublincore", "label": "Rpg-schema", "namespace": "dc", "description":"Dublin Core for document description", "path":"dc.ttl", "tags":[] },
-    {"slug": "schemaorg", "label": "Rpg-schema", "namespace": "schema", "description":"Schema.org for all things", "path":"schemaorg.ttl", "tags":[] },
+    {"slug": "rpg", "label": "RPG Schema", "namespace": "rpg", "description":"Ontology for TTRPGs", "path":"rpg.ttl", "tags":[] },
+    {"slug": "foaf", "label": "FOAF", "namespace": "foaf", "description":"Friend of a Friend", "path":"foaf.ttl", "tags":[] },
+    {"slug": "dublincore", "label": "Dublin Core", "namespace": "dc", "description":"Dublin Core for document description", "path":"dc.ttl", "tags":[] },
+    {"slug": "schemaorg", "label": "Schema.org", "namespace": "schema", "description":"Schema.org for all things", "path":"schemaorg.ttl", "tags":[] },
     {"slug": "fitd", "label": "Forged in the Dark schema", "namespace": "fitd", "description":"Forged in the dark SRD schema", "path":"fitd.ttl", "tags":[] },
-    {"slug": "cbrpnk", "label": "CBR+PNK SRD schema", "namespace": "fitd", "description":"CBR+PNK SRD schema", "path":"cbrpnk.ttl", "tags":[] },
+    {"slug": "cbrpnk", "label": "CBR+PNK SRD schema", "namespace": "cbrpnk", "description":"CBR+PNK SRD schema", "path":"cbrpnk.ttl", "tags":[] },
     {"slug": "gumshoe", "label": "Gumshoe schema", "namespace": "gumshoe", "description":"Gumshoe SRD schema", "path":"gumshoe_srd.ttl", "tags":[] }
   ]
 }
